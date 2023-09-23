@@ -4,16 +4,18 @@ import useGet from '../hooks/useGet';
 import EditStudyTemplate from '../components/Study/EditStudyTemplate';
 import {request} from "../utils/request";
 
+
 export default function EditStudyPage() {
     const { studyId } = useParams();
-    const researcherId = '64fe98fdae1ff28bdcd455a7';
+    // const researcherId = '64fe98fdae1ff28bdcd455a7';
+
     const { data, isLoading, refresh } = useGet(`/study/${studyId}`, []);
     const [studyData, setStudyData] = useState({
         studyCode: '',
         studyName: '',
         description: '',
-        creator: researcherId,
-        researcherList: [researcherId],
+        creator: '',
+        researcherList: [],
         studyType: '',
         participantNum: '',
         recruitmentStartDate: '',
@@ -28,7 +30,8 @@ export default function EditStudyPage() {
             studyCode: data.studyCode ?? "",
             studyName: data.studyName ?? "",
             description: data.description ?? "",
-            researcherList: data.researcherList ?? [researcherId],
+            creator: data.creator,
+            researcherList: data.researcherList,
             studyType: data.studyType ?? "",
             participantNum: data.participantNum ?? "",
             recruitmentStartDate: data.recruitmentStartDate?.split("T")[0] ?? "",
@@ -46,6 +49,7 @@ export default function EditStudyPage() {
                 alert("Successfully edited study");
                 refresh();
             })
+        
     };
 
     const editStudy = async (studyData) => {

@@ -34,3 +34,5 @@ app.use('/', routes);
 
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true })
     .then(() => app.listen(port, () => log4js.info(`App server listening on port ${port}!`)));
+
+export default app;

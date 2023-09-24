@@ -19,12 +19,12 @@ app.use(cors({
 }));
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://human-participant-system-frontend.vercel.app');
+    res.header('Access-Control-Allow-Origin', '*'); // Allow all origins
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Access-Control-Allow-Credentials', 'true'); // Added this line
     next();
 });
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));

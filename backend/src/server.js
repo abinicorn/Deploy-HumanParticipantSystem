@@ -29,11 +29,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); // Allow requests from any origin
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-});
+app.use(cors());
 
 // Setup log4js
 const log4js = require('./utils/log4js')

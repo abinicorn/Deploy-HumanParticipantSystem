@@ -8,8 +8,7 @@
     "init-db": "node -r esm ./src/database/init-db.js",
     "production": "cross-env NODE_ENV=production PORT=3000 node -r esm ./src/index.js",
     "test": "jest",
-    "dev": "nodemon -r esm ./src/index.js",
-    "vercell-build": "echo hello"
+    "dev": "nodemon -r esm ./src/index.js"
   },
   "license": "MIT",
   "dependencies": {

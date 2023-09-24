@@ -54,7 +54,7 @@ app.use('/', routes);
 // Setup token authenticate
 
 // Start the DB running. Then, once it's connected, start the server.
-mongoose.connect( process.env.DB_URL, { useNewUrlParser: true })
+mongoose.connect( "mongodb+srv://Abby:pVoNSIPYlSxJVFV3@studymanagement.nxvpoy3.mongodb.net/researchFusion", { useNewUrlParser: true })
     .then(() => app.listen(port, () => log4js.info(`App server listening on port ${port}!`)));
 
 module.exports = app;

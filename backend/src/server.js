@@ -22,6 +22,11 @@ app.use((req, res, next) => {
     next();
 });
 // Setup CORS (place this before your routes)
+app.use(cors({
+    origin: 'https://human-participant-system-frontend.vercel.app',
+    methods: 'GET,PUT,POST,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+}));
 
 // Setup body-parser
 app.use(express.json({ limit: '50mb' }));
@@ -29,10 +34,10 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
-app.use(cors({
-    origin: 'http://localhost:3000', // 允许的前端域名
-    credentials: true, // 允许发送和接收Cookie
-}));
+// app.use(cors({
+//     origin: 'http://localhost:3000', // 允许的前端域名
+//     credentials: true, // 允许发送和接收Cookie
+// }));
 
 // Setup log4js
 const log4js = require('./utils/log4js')
@@ -51,3 +56,5 @@ app.use('/', routes);
 // Start the DB running. Then, once it's connected, start the server.
 mongoose.connect( process.env.DB_URL, { useNewUrlParser: true })
     .then(() => app.listen(port, () => log4js.info(`App server listening on port ${port}!`)));
+
+module.exports = app;

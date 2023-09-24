@@ -28,7 +28,12 @@ function App() {
           <Route path='/' element={<Login/>} />
 
           <Route path="session">
-            <Route path=":studyId" element = {<SessionContextProvider><SessionManagePage/></SessionContextProvider>} />
+            <Route path=":studyId" element = {
+              <SessionContextProvider>
+                <StudyResearcherContextProvider>
+                  <SessionManagePage/>
+                </StudyResearcherContextProvider>
+              </SessionContextProvider>} />
           </Route>
           <Route path="/homepage" element={
               <AuthenticationRedirect>

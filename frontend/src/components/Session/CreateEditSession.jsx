@@ -7,6 +7,7 @@ import ConfirmPopup from '../Popup/ConfirmPopup';
 import OptionPopup from '../Popup/OptionPopup';
 import { SessionContext } from '../../providers/SessionContextProvider';
 import { combineCodeSerialNum } from '../../utils/combineCodeSerialNum';
+import { StudyResearcherContext } from '../../providers/StudyResearcherContextProvider';
 
 function not(a, b) {
   return a.filter((value) => b.indexOf(value) === -1);
@@ -23,7 +24,8 @@ function union(a, b) {
 export default function CreateEditSession({create, targetSessionId}) {
   
   const scroll ='paper';
-  const { sessions, studyParticipantInfo, studyInfo, addSession, updateSession, refreshSession} = React.useContext(SessionContext);
+  const { studyInfo } = React.useContext(StudyResearcherContext);
+  const { sessions, studyParticipantInfo, addSession, updateSession, refreshSession} = React.useContext(SessionContext);
   const targetSession = sessions.find(s => s._id === targetSessionId);
   const studyId = useParams();
   const [sessionContent, setSessionContent] = React.useState({

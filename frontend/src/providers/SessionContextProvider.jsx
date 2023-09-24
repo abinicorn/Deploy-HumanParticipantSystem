@@ -17,8 +17,6 @@ export default function SessionContextProvider({children}) {
 
     const { data: studyParticipantInfo } = useGet(`http://localhost:3001/study-participants/${studyId}`, []);
     
-    const { data: studyInfo } = useGet(`http://localhost:3001/study/${studyId}`,[])
-    
     async function addSession (newSession) {
         const sessionResponse = await request.post(`http://localhost:3001/session/${studyId}`, newSession)
         refreshSession();
@@ -38,7 +36,6 @@ export default function SessionContextProvider({children}) {
         studyId,
         sessions,
         sessionLoading,
-        studyInfo,
         studyParticipantInfo,
         addSession,
         updateSession,

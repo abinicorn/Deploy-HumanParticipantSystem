@@ -21,7 +21,7 @@ export default function Sidebar({isSession}) {
 
     async function getStudyList (userId) {
         const response = await request.get(`http://localhost:3001/researcher/list/${userId}`)
-        setStudyList(response.data)
+        setStudyList(response.data.filter(function(item) {return item.isClosed === false}))
     }
     
     React.useEffect(() => {

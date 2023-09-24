@@ -5,41 +5,27 @@ import Sidebar from "../components/Sidebar";
 import CreateEditSession from '../components/Session/CreateEditSession';
 import SessionActionButton from '../components/Button/SessionActionButton';
 import { SessionContext } from '../providers/SessionContextProvider';
-import { DataGrid, GridToolbar  } from '@mui/x-data-grid';
-import {styled} from '@mui/material/styles'
+import { GridToolbar  } from '@mui/x-data-grid';
+import { StyledDataGrid } from '../styles/StyledDataGrid';
 import SessionArchive from '../components/Session/SessionArchive';
 import { CurrentUserContextProvider } from '../providers/CurrentUserProvider';
-
-const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-  '& .MuiDataGrid-columnHeader': {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  '& .MuiDataGrid-columnHeaderTitle': {
-      whiteSpace: 'pre-line',
-      lineHeight: '1.4',
-      textAlign: 'center'
-  },
-  '& .MuiDataGrid-cell:focus': {
-      outline: 'none'
-  }
-}));
+import { CustomNoRowsOverlaySession } from '../styles/CustomNoRowsOverlay';
+import { StudyResearcherContext } from '../providers/StudyResearcherContextProvider';
 
 
 export default function SessionManagePage() {
   
-  const {sessions, studyInfo} = React.useContext(SessionContext);
+  const { studyInfo } = React.useContext(StudyResearcherContext)
+  const { sessions } = React.useContext(SessionContext);
   const activeSessions = sessions.filter(function(item) {return item.isArchive === false});
 
   const columns = [
-    { field: 'sessionCode', headerName: 'Session Code', width: 250, headerAlign: 'center', align:'center'},
-    { field: 'date', headerName: 'Date', width: 250, headerAlign: 'center', align:'center', valueGetter: (params) => (params.value.slice(0,10)) },
-    { field: 'time', headerName: 'Time', width: 250, headerAlign: 'center', align:'center'},
-    { field: 'location', headerName: 'Location', width: 250, headerAlign: 'center', align:'center'},
-    { field: 'participantNum', headerName: 'Participant Number', width: 250, headerAlign: 'center', align:'center' },
-    { field: '_id', headerName: 'Action', width: 200, headerAlign: 'center', align:'center', renderCell: (params) => (<SessionActionButton pageItemId = {params.value}/>)},
+    { field: 'sessionCode', headerName: 'Session Code', flex: 1.5, headerAlign: 'center', align:'center'},
+    { field: 'date', headerName: 'Date', flex: 1.5, headerAlign: 'center', align:'center', valueGetter: (params) => (params.value.slice(0,10)) },
+    { field: 'time', headerName: 'Time', flex: 1.5, headerAlign: 'center', align:'center'},
+    { field: 'location', headerName: 'Location', flex: 1.5, headerAlign: 'center', align:'center'},
+    { field: 'participantNum', headerName: 'Participant Number', flex: 1.5, headerAlign: 'center', align:'center' },
+    { field: '_id', headerName: 'Action', flex: 1, headerAlign: 'center', align:'center', renderCell: (params) => (<SessionActionButton pageItemId = {params.value}/>)},
   ]
 
     return (
@@ -59,7 +45,10 @@ export default function SessionManagePage() {
             </Box>
               <StyledDataGrid
               sx={{
-                height: "80vh",
+                height: "65vh",
+                maxWidth: '100vw', 
+                overflowY: 'auto',
+                overflowX: 'hidden',
                 marginTop: 2,
                 '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
                     '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
@@ -75,6 +64,7 @@ export default function SessionManagePage() {
               }}
               pageSizeOptions={[10, 25, 50]}
               slots={{
+                noRowsOverlay: CustomNoRowsOverlaySession,
                 toolbar: GridToolbar
               }}
               disableSelectionOnClick

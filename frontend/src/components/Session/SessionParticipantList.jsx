@@ -3,11 +3,14 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, Table
     TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
 import SessionMailingList from './SessionMailingList';
 import { SessionContext } from '../../providers/SessionContextProvider';
+import { combineCodeSerialNum } from '../../utils/combineCodeSerialNum';
+import { StudyResearcherContext } from '../../providers/StudyResearcherContextProvider';
 
 export default function SessionParticipantList({ targetSessionId }) {
     
     const [open, setOpen] = React.useState(false);
     const scroll ='paper';
+    const { studyInfo } = React.useContext(StudyResearcherContext);
     const { sessions, studyParticipantInfo } = React.useContext(SessionContext);
     const targetSession = sessions.find(s => s._id === targetSessionId);
     let participantInfo = []
@@ -60,7 +63,7 @@ export default function SessionParticipantList({ targetSessionId }) {
                                 key={info._id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
-                                <TableCell component="th" scope="row">{info.serialNum}</TableCell>
+                                <TableCell component="th" scope="row">{combineCodeSerialNum( studyInfo.studyCode, info.serialNum)}</TableCell>
                                 <TableCell align="right">{info.participantInfo.firstName}</TableCell>
                                 <TableCell align="right">{info.participantInfo.lastName}</TableCell>
                                 <TableCell align="right">{info.participantInfo.email}</TableCell>

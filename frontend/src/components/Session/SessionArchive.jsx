@@ -1,26 +1,10 @@
 import * as React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { SessionContext } from '../../providers/SessionContextProvider';
-import { DataGrid, GridToolbar  } from '@mui/x-data-grid';
-import {styled} from '@mui/material/styles'
+import { GridToolbar  } from '@mui/x-data-grid';
+import { StyledDataGrid } from '../../styles/StyledDataGrid';
 import SessionParticipantList from './SessionParticipantList';
-
-const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-    '& .MuiDataGrid-columnHeader': {
-      backgroundColor: theme.palette.primary.main,
-      color: theme.palette.common.white,
-      fontWeight: 'bold',
-      fontSize: 15,
-    },
-    '& .MuiDataGrid-columnHeaderTitle': {
-        whiteSpace: 'pre-line',
-        lineHeight: '1.4',
-        textAlign: 'center'
-    },
-    '& .MuiDataGrid-cell:focus': {
-        outline: 'none'
-    }
-  }));
+import { CustomNoRowsOverlaySession } from '../../styles/CustomNoRowsOverlay';
 
 export default function SessionArchive() {
 
@@ -30,12 +14,12 @@ export default function SessionArchive() {
     const archivedSessions = sessions.filter(function(item) {return item.isArchive === true});
 
     const columns = [
-        { field: 'sessionCode', headerName: 'Session Code', width: 180, headerAlign: 'center', align:'center'},
-        { field: 'date', headerName: 'Date', width: 180, headerAlign: 'center', align:'center', valueGetter: (params) => (params.value.slice(0,10)) },
-        { field: 'time', headerName: 'Time', width: 180, headerAlign: 'center', align:'center'},
-        { field: 'location', headerName: 'Location', width: 200, headerAlign: 'center', align:'center'},
-        { field: 'participantNum', headerName: 'Participant Number', width: 180, headerAlign: 'center', align:'center' },
-        { field: '_id', headerName: 'Participant List', width: 230, headerAlign: 'center', align:'center', renderCell: (params) => (<Button variant="contained"><SessionParticipantList targetSessionId={params.value}/></Button>)},
+        { field: 'sessionCode', headerName: 'Session Code', flex: 1, headerAlign: 'center', align:'center'},
+        { field: 'date', headerName: 'Date', flex: 1, headerAlign: 'center', align:'center', valueGetter: (params) => (params.value.slice(0,10)) },
+        { field: 'time', headerName: 'Time', flex: 1, headerAlign: 'center', align:'center'},
+        { field: 'location', headerName: 'Location', flex: 1, headerAlign: 'center', align:'center'},
+        { field: 'participantNum', headerName: 'Participant Number', flex: 1, headerAlign: 'center', align:'center' },
+        { field: '_id', headerName: 'Participant List', flex: 1.5, headerAlign: 'center', align:'center', renderCell: (params) => (<Button variant="contained"><SessionParticipantList targetSessionId={params.value}/></Button>)},
     ]
 
     const handleClickOpen = () => {
@@ -63,6 +47,10 @@ export default function SessionArchive() {
                 <DialogContent dividers={scroll === 'paper'}>
                     <StyledDataGrid
                         sx={{
+                            height: "60vh",
+                            maxWidth: '100vw', 
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
                             marginTop: 2,
                             '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
                                 '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
@@ -78,6 +66,7 @@ export default function SessionArchive() {
                         }}
                         pageSizeOptions={[10, 25, 50]}
                         slots={{
+                            noRowsOverlay: CustomNoRowsOverlaySession,
                             toolbar: GridToolbar
                         }}
                         disableSelectionOnClick

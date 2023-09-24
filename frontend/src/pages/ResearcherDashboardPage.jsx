@@ -195,7 +195,7 @@ export default function ResearcherDashboardPage() {
 
             <Grid container spacing={-20}
                     alignItems="center"
-                    marginTop='1%'
+                    marginTop='5%'
                     marginBottom = '0.5%'
                     justifyContent="flex-end"
             >

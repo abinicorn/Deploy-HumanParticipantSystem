@@ -18,7 +18,7 @@ const router = express.Router();
 
 const secret = "secret123";
 
-const expiresIn = '43200000';
+const expiresIn = '12h';
 
 /**
  * @swagger
@@ -88,16 +88,26 @@ router.post('/login', async (req, res) => {
             return res.status(HTTP_LOGIN_ERROR).json({ message: 'Username or password error' })
         }
         const { _id } = user;
-        const token = jwt.sign({ _id }, secret
-            , { expiresIn }
-        )
+
+
+
         const result = {
-            _id,
-            token
+            _id
         };
-        log4js.info(`Researcher.router.post./login. ResearcherId : ${user._id} login success`);
-        return res.cookie("access_token", token, {httpOnly: true })
-            .status(HTTP_SUCCESS).json({ message: 'Login Success', result: result });
+        jwt.sign(
+            { _id },
+            secret,
+            { expiresIn },
+            (err, token) => {
+                // res.status(HTTP_SUCCESS).cookie("token", token).json({ message: 'Login Success'});
+                res.status(HTTP_SUCCESS).cookie("token", token, { httpOnly: true})
+                    .json({ message: 'Login Success', result: result });
+                log4js.info(`Researcher.router.post./login. ResearcherId : ${user._id} login success`)
+            }
+
+        )
+
+        // return res.status(HTTP_SUCCESS).cookie("token", token).json({ message: 'Login Success', result: result });
     } catch (error) {
         log4js.error(`Researcher.router.post./login. Server error: ${error}`);
         return res.status(HTTP_SERVER_ERROR).json({ message: 'Server error' })
@@ -152,13 +162,14 @@ router.get('/logout', (req, res) => {
 router.get('/info/:researcherId', async (req, res) => {
 
     const { researcherId } = req.params;
+
     try{
         const user = await ResearcherDao.getResearcherById(researcherId);
 
         log4js.info(`Researcher.router.get./info/:researcherId. ResearcherId: ${researcherId} info retrieved`)
         return res.status(HTTP_SUCCESS).json({ message: 'User Info',
             result: { firstName: user.firstName, lastName: user.lastName, email: user.email, studyList: user.studyList}
-        });
+        })
     } catch (error) {
         log4js.error(`Researcher.router.get./info/:researcherId. Internal server error: ${error}`);
         return res.status(HTTP_SERVER_ERROR).json({ message: 'Server error'})
@@ -516,7 +527,7 @@ router.post('/add', async (req, res) => {
     });
     try{
         await ResearcherDao.createResearch(newResearcher);
-
+        
         log4js.info(`Researcher.router.post/add. ${newResearcher.username} created success`);
         return res.status(HTTP_SUCCESS)
             .json({ message: 'Create new researcher success'})
@@ -551,6 +562,8 @@ router.get('/studyList/:researcherId', async (req, res) => {
 
                 let study = await StudyDao.retrieveStudyReport(user.studyList[i]);
 
+                console.log(study);
+
                 if (!study) {
                     log4js.warn(`Researcher.router.get/studyList/:researcherId. Researcher ${researcherId} study not found`);
                     return res.status(HTTP_NOT_FOUND).json({ message: 'Study not found' });
@@ -577,10 +590,12 @@ router.get('/studyList/:researcherId', async (req, res) => {
                     surveyLink: study.surveyLink
                 }
 
+                console.log(result);
                 studlyInfoList.push(result)
             }
         }
 
+        console.log(studlyInfoList);
 
         log4js.info(`Researcher.router.get/studyList/:researcherId. Get ${researcherId} study info success`);
         return res.status(HTTP_SUCCESS)

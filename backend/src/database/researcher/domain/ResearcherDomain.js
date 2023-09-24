@@ -10,7 +10,6 @@ const researcherSchema = new Schema({
     username: {type: String, unique: true},
     password: String,
     studyList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Study'}],
-    isActive: Boolean
 }, {
     timestamps: true
 });

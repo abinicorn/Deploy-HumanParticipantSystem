@@ -1,13 +1,11 @@
 import jwt from "jsonwebtoken";
 // Require variables from .env file
-import * as dotenv from "dotenv";
 dotenv.config();
-
+import * as dotenv from "dotenv";
 
 import {HTTP_TOKEN_NOT_FOUND} from '../enum.js';
 
 const secret = "secret123";
-const expired = "43200000";
 
 
 // Protect routes by verifying user token and checking db
@@ -17,20 +15,23 @@ const verifyUserAuth = async (req, res, next) => {
         next();
         return
     }
-    const token = req.headers.authorization;
 
+    const token = req.cookies.token;
     if (!token) {
         return res.status(HTTP_TOKEN_NOT_FOUND).json({ message: 'Logout status, no access' });
     }
 
     try {
         // Verify jwt token
-        const decoded = await jwt.verify(token, secret, { expiresIn: expired });
+        const decoded = await jwt.verify(token, secret);
+
         if (decoded != null) {
-            next();
+
+              next();
         }else {
             res.status(HTTP_TOKEN_NOT_FOUND).json({ message: 'Token error' });
         }
+
     } catch (err) {
         res.status(HTTP_TOKEN_NOT_FOUND).json({ message: 'Token error' });
     }

@@ -2,13 +2,13 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/server.js",
+  "main": "./api/index.js",
   "scripts": {
-    "start": "node -r esm ./src/server.js",
+    "start": "node -r esm ./api/index.js",
     "init-db": "node -r esm ./src/database/init-db.js",
-    "production": "cross-env NODE_ENV=production PORT=3000 node -r esm ./src/server.js",
+    "production": "cross-env NODE_ENV=production PORT=3000 node -r esm ./api/index.js",
     "test": "jest",
-    "dev": "nodemon -r esm ./src/server.js"
+    "dev": "nodemon -r esm ./api/index.js"
   },
   "license": "MIT",
   "dependencies": {

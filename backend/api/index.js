@@ -2,8 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec } from './config/swaggerConfig';
-import authenticateToken from './middlewares/authenticateToken';
+import { swaggerSpec } from '../src/config/swaggerConfig';
+import authenticateToken from '../src/middlewares/authenticateToken';
 import cors from 'cors';
 import cookieParser from 'cookie-parser'; // Added cookieParser import
 
@@ -26,10 +26,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(cookieParser()); // Added cookieParser
 
 // Setup log4js
-const log4js = require('./utils/log4js');
+const log4js = require('../src/utils/log4js');
 
 // app.use(authenticateToken);
-import routes from './routes/index.js';
+import routes from '../src/routes/index.js';
 app.use('/', routes);
 
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true })

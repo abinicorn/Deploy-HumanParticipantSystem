@@ -6,7 +6,7 @@ import {request} from "../../utils/request";
 export const addParticipants = createAsyncThunk(
   'participants/addParticipants',
   async (participants) => {
-    const response = await request.post('http://localhost:3001/participant/add', participants);
+    const response = await request.post('https://human-participant-system-server.vercel.app/participant/add', participants);
     return response.data;
   }
 );

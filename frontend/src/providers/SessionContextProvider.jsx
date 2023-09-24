@@ -13,12 +13,12 @@ export default function SessionContextProvider({children}) {
         data: sessions,
         isLoading: sessionLoading,
         refresh: refreshSession
-    } = useGet(`http://localhost:3001/session/list/${studyId}`, [])
+    } = useGet(`https://human-participant-system-server.vercel.app/session/list/${studyId}`, [])
 
-    const { data: studyParticipantInfo } = useGet(`http://localhost:3001/study-participants/${studyId}`, []);
+    const { data: studyParticipantInfo } = useGet(`https://human-participant-system-server.vercel.app/study-participants/${studyId}`, []);
     
     async function addSession (newSession) {
-        const sessionResponse = await request.post(`http://localhost:3001/session/${studyId}`, newSession)
+        const sessionResponse = await request.post(`https://human-participant-system-server.vercel.app/session/${studyId}`, newSession)
         refreshSession();
         return sessionResponse.data
     }
@@ -26,7 +26,7 @@ export default function SessionContextProvider({children}) {
     async function updateSession (updateData) {
         
         const sessionId = updateData._id
-        const response = await request.put(`http://localhost:3001/session/${sessionId}`, updateData)
+        const response = await request.put(`https://human-participant-system-server.vercel.app/session/${sessionId}`, updateData)
         console.log(response)
         refreshSession();
         return response.data

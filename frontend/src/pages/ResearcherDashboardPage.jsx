@@ -30,7 +30,7 @@ export default function ResearcherDashboardPage() {
         const fetchData = async () => {
 
                     try {
-                        const studyInfoList = await request.get(`http://localhost:3001/researcher/studyList/${user.userId}`);
+                        const studyInfoList = await request.get(`https://human-participant-system-server.vercel.app/researcher/studyList/${user.userId}`);
 
                         setStudyList(studyInfoList.data);
                     } catch (error) {

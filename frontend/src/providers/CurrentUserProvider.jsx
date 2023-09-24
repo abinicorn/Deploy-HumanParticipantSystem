@@ -27,7 +27,7 @@ export function CurrentUserContextProvider ({ children })  {
     const fetchUserInfo = async (token, userId) => {
         try {
 
-            const response = await request.get(`http://localhost:3001/researcher/info/${userId}`);
+            const response = await request.get(`https://human-participant-system-server.vercel.app/researcher/info/${userId}`);
 
 
             const firstName = response.data.result.firstName;

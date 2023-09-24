@@ -40,7 +40,7 @@ export const authService = {
 }
 
 const fetchLogin = async (username, password) => {
-        return  await axios.post('http://localhost:3001/researcher/login', {
+        return  await axios.post('https://human-participant-system-server.vercel.app/researcher/login', {
             username,
             password,
         },
@@ -53,7 +53,7 @@ const fetchLogin = async (username, password) => {
 const fetchLogOut = async () => {
 
     try {
-        const response = await request.get('http://localhost:3001/researcher/logout');
+        const response = await request.get('https://human-participant-system-server.vercel.app/researcher/logout');
         return response;
     } catch (error) {
         throw new Error(error);

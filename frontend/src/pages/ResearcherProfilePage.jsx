@@ -52,7 +52,7 @@ export default function ResearcherProfilePage() {
 
 
     const updateInfo = async () => {
-        const url = 'http://localhost:3001/researcher/update/info';
+        const url = 'https://human-participant-system-server.vercel.app/researcher/update/info';
 
         const req = {
             firstName: currentUserInfo.currentFirstName,
@@ -125,7 +125,7 @@ export default function ResearcherProfilePage() {
     };
 
     const resetPassword = (currentPwd, newPwd) => {
-        const url = 'http://localhost:3001/researcher/resetPwd';
+        const url = 'https://human-participant-system-server.vercel.app/researcher/resetPwd';
 
         const req = {
             currentPwd: currentPwd,

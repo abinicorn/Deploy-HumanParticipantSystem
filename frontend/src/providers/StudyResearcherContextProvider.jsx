@@ -24,7 +24,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         data: studyInfo,
         isLoadig: studyLoading,
         refresh: refreshStudyContext
-    } = useGet(`http://localhost:3001/study/${studyIdToUse}`,[]);
+    } = useGet(`https://human-participant-system-server.vercel.app/study/${studyIdToUse}`,[]);
 
     console.log(studyInfo);
 
@@ -32,7 +32,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         data: researcherList,
         isLoadig: researcherLoading,
         refresh: refreshResearcherContext
-    } = useGet(`http://localhost:3001/study/researcher/list/${studyIdToUse}`,[]);
+    } = useGet(`https://human-participant-system-server.vercel.app/study/researcher/list/${studyIdToUse}`,[]);
 
     console.log(researcherList);
 
@@ -44,7 +44,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
     //to do
     async function addResearcher (newResearcher) { 
         try{
-            const researcherResponse = await request.post(`http://localhost:3001/study/addResearcher/${studyIdToUse}`, newResearcher)
+            const researcherResponse = await request.post(`https://human-participant-system-server.vercel.app/study/addResearcher/${studyIdToUse}`, newResearcher)
             console.log(researcherResponse);
             refreshResearcherContext();
             return researcherResponse.data;
@@ -55,7 +55,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
 
     async function removeResearcher (studyId, researcherId) {
         try {
-            const response = await request.put(`http://localhost:3001/study/removeResearcher/${studyIdToUse}/${researcherId}`);
+            const response = await request.put(`https://human-participant-system-server.vercel.app/study/removeResearcher/${studyIdToUse}/${researcherId}`);
             refreshResearcherContext();
             return response.data;
         } catch (error) {
@@ -68,7 +68,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
 
 
         
-        const response = await request.get(`http://localhost:3001/researcher/email/${email}`);
+        const response = await request.get(`https://human-participant-system-server.vercel.app/researcher/email/${email}`);
         return response;
     }
 

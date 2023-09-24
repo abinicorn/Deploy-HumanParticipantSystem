@@ -95,7 +95,7 @@ export default function ResearcherManagePopup() {
 
 
     const handleSearchClick = async () => {
-        const response = await axios.get(`http://localhost:3001/researcher/email/${email}`);
+        const response = await axios.get(`https://human-participant-system-server.vercel.app/researcher/email/${email}`);
         if (response.status === 200) {
             setMsgOpen(true);
             setResearcherId(response.data._id);
@@ -108,7 +108,7 @@ export default function ResearcherManagePopup() {
     const handleAddRsearcher = async () => {
         try {
             console.log(researcherId);
-            const data = await axios.put(`http://localhost:3001/study/associateResearcher/${studyInfo._id}/${researcherId}`);
+            const data = await axios.put(`https://human-participant-system-server.vercel.app/study/associateResearcher/${studyInfo._id}/${researcherId}`);
             if (data.status === 200) {
                 console.log("success");
                 refreshResearcherContext();

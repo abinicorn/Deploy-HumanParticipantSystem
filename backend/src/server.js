@@ -44,7 +44,7 @@ const log4js = require('./utils/log4js')
 
 app.use(cookieParser());
 
-app.use(authenticateToken);
+// app.use(authenticateToken);
 
 // Setup our routes.
 import routes from './routes/index.js';

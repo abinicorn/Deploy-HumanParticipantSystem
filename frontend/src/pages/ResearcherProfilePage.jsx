@@ -52,7 +52,7 @@ export default function ResearcherProfilePage() {
 
 
     const updateInfo = async () => {
-        const url = 'https://human-participant-system-server.vercel.app/researcher/update/info';
+        const url = 'http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/researcher/update/info';
 
         const req = {
             firstName: currentUserInfo.currentFirstName,
@@ -125,7 +125,7 @@ export default function ResearcherProfilePage() {
     };
 
     const resetPassword = (currentPwd, newPwd) => {
-        const url = 'https://human-participant-system-server.vercel.app/researcher/resetPwd';
+        const url = 'http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/researcher/resetPwd';
 
         const req = {
             currentPwd: currentPwd,

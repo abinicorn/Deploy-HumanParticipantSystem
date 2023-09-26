@@ -6,7 +6,7 @@ import {request} from "../../utils/request";
 export const addParticipants = createAsyncThunk(
   'participants/addParticipants',
   async (participants) => {
-    const response = await request.post('https://human-participant-system-server.vercel.app/participant/add', participants);
+    const response = await request.post('http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/participant/add', participants);
     return response.data;
   }
 );

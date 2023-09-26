@@ -95,7 +95,7 @@ export default function ResearcherManagePopup() {
 
 
     const handleSearchClick = async () => {
-        const response = await axios.get(`https://human-participant-system-server.vercel.app/researcher/email/${email}`);
+        const response = await axios.get(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/researcher/email/${email}`);
         if (response.status === 200) {
             setMsgOpen(true);
             setResearcherId(response.data._id);
@@ -108,7 +108,7 @@ export default function ResearcherManagePopup() {
     const handleAddRsearcher = async () => {
         try {
             console.log(researcherId);
-            const data = await axios.put(`https://human-participant-system-server.vercel.app/study/associateResearcher/${studyInfo._id}/${researcherId}`);
+            const data = await axios.put(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/study/associateResearcher/${studyInfo._id}/${researcherId}`);
             if (data.status === 200) {
                 console.log("success");
                 refreshResearcherContext();

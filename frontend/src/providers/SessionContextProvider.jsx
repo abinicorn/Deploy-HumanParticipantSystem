@@ -13,12 +13,12 @@ export default function SessionContextProvider({children}) {
         data: sessions,
         isLoading: sessionLoading,
         refresh: refreshSession
-    } = useGet(`https://human-participant-system-server.vercel.app/session/list/${studyId}`, [])
+    } = useGet(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/session/list/${studyId}`, [])
 
-    const { data: studyParticipantInfo } = useGet(`https://human-participant-system-server.vercel.app/study-participants/${studyId}`, []);
+    const { data: studyParticipantInfo } = useGet(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/study-participants/${studyId}`, []);
     
     async function addSession (newSession) {
-        const sessionResponse = await request.post(`https://human-participant-system-server.vercel.app/session/${studyId}`, newSession)
+        const sessionResponse = await request.post(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/session/${studyId}`, newSession)
         refreshSession();
         return sessionResponse.data
     }
@@ -26,7 +26,7 @@ export default function SessionContextProvider({children}) {
     async function updateSession (updateData) {
         
         const sessionId = updateData._id
-        const response = await request.put(`https://human-participant-system-server.vercel.app/session/${sessionId}`, updateData)
+        const response = await request.put(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/session/${sessionId}`, updateData)
         console.log(response)
         refreshSession();
         return response.data

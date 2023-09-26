@@ -40,7 +40,7 @@ export const authService = {
 }
 
 const fetchLogin = async (username, password) => {
-        return  await axios.post('https://human-participant-system-server.vercel.app/researcher/login', {
+        return  await axios.post('http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/researcher/login', {
             username,
             password,
         },
@@ -53,7 +53,7 @@ const fetchLogin = async (username, password) => {
 const fetchLogOut = async () => {
 
     try {
-        const response = await request.get('https://human-participant-system-server.vercel.app/researcher/logout');
+        const response = await request.get('http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/researcher/logout');
         return response;
     } catch (error) {
         throw new Error(error);

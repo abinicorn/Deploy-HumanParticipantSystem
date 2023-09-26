@@ -30,7 +30,7 @@ export default function ResearcherDashboardPage() {
         const fetchData = async () => {
 
                     try {
-                        const studyInfoList = await request.get(`https://human-participant-system-server.vercel.app/researcher/studyList/${user.userId}`);
+                        const studyInfoList = await request.get(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/researcher/studyList/${user.userId}`);
 
                         setStudyList(studyInfoList.data);
                     } catch (error) {

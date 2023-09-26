@@ -5,7 +5,7 @@ import {request} from "../../utils/request";
 export const fetchStudyParticipants = createAsyncThunk(
   'studyParticipants/fetchStudyParticipants',
   async (study_id) => {
-    const response = await request.get(`https://human-participant-system-server.vercel.app/study-participants/${study_id}`);
+    const response = await request.get(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/study-participants/${study_id}`);
     if (response.status == 204){
       return [];
     }
@@ -17,7 +17,7 @@ export const fetchStudyParticipants = createAsyncThunk(
 export const addStudyParticipants = createAsyncThunk(
   'studyParticipants/addParticipants',
   async ({ study_id, studyParticipants }) => {
-    const response = await request.post(`https://human-participant-system-server.vercel.app/study-participants/${study_id}`, studyParticipants);
+    const response = await request.post(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/study-participants/${study_id}`, studyParticipants);
     return response.data;
   }
 );

@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://human-participant-system-server.vercel.app/",
+  "proxy": "http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/",
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@emotion/react": "^11.11.1",

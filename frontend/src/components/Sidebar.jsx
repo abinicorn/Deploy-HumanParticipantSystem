@@ -20,7 +20,7 @@ export default function Sidebar({isSession}) {
     const [ studyList, setStudyList ] = React.useState([]);
 
     async function getStudyList (userId) {
-        const response = await request.get(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/researcher/list/${userId}`)
+        const response = await request.get(`https://human-participant.onrender.com/researcher/list/${userId}`)
         setStudyList(response.data.filter(function(item) {return item.isClosed === false}))
     }
     

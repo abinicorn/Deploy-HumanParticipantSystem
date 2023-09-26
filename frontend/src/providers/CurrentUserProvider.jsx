@@ -27,7 +27,7 @@ export function CurrentUserContextProvider ({ children })  {
     const fetchUserInfo = async (token, userId) => {
         try {
 
-            const response = await request.get(`http://test-2-backend-env.eba-p2c8ucse.ap-southeast-2.elasticbeanstalk.com/researcher/info/${userId}`);
+            const response = await request.get(`https://human-participant.onrender.com/researcher/info/${userId}`);
 
 
             const firstName = response.data.result.firstName;

@@ -6,7 +6,7 @@ import {request} from "../../utils/request";
 export const addParticipants = createAsyncThunk(
   'participants/addParticipants',
   async (participants) => {
-    const response = await request.post('https://human-participant.onrender.com/participant/add', participants);
+    const response = await request.post('https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/add', participants);
     return response.data;
   }
 );

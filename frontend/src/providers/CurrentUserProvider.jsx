@@ -27,7 +27,7 @@ export function CurrentUserContextProvider ({ children })  {
     const fetchUserInfo = async (token, userId) => {
         try {
 
-            const response = await request.get(`https://human-participant.onrender.com/researcher/info/${userId}`);
+            const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/info/${userId}`);
 
 
             const firstName = response.data.result.firstName;

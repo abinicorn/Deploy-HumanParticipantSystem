@@ -20,7 +20,7 @@ export default function Sidebar({isSession}) {
     const [ studyList, setStudyList ] = React.useState([]);
 
     async function getStudyList (userId) {
-        const response = await request.get(`https://human-participant.onrender.com/researcher/list/${userId}`)
+        const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/list/${userId}`)
         setStudyList(response.data.filter(function(item) {return item.isClosed === false}))
     }
     

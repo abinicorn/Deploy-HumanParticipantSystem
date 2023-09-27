@@ -40,7 +40,7 @@ export const authService = {
 }
 
 const fetchLogin = async (username, password) => {
-        return  await axios.post('https://human-participant.onrender.com/researcher/login', {
+        return  await axios.post('https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/login', {
             username,
             password,
         },
@@ -53,7 +53,7 @@ const fetchLogin = async (username, password) => {
 const fetchLogOut = async () => {
 
     try {
-        const response = await request.get('https://human-participant.onrender.com/researcher/logout');
+        const response = await request.get('https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/logout');
         return response;
     } catch (error) {
         throw new Error(error);

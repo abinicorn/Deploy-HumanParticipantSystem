@@ -52,7 +52,7 @@ export default function StudyParticipantProvider({children}) {
 
     async function fetchStudyParticipants() {
         try {
-            const response = await request.get(`https://human-participant.onrender.com/study-participants/${studyId}`, {
+            const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${studyId}`, {
                 cancelToken: new CancelToken(function executor(c) {
                     cancel = c;
                 })
@@ -72,18 +72,18 @@ export default function StudyParticipantProvider({children}) {
     };
 
     async function fetchTags() {
-        const response = await request.get('https://human-participant.onrender.com/tag/all');
+        const response = await request.get('https://participant-system-server-68ca765c5ed2.herokuapp.com/tag/all');
         setTags(response.data);
     }
     
     async function addParticipants (newParticipants) {
-        const participantsResponse = await request.post(`https://human-participant.onrender.com/participant/add`, newParticipants)
+        const participantsResponse = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/add`, newParticipants)
         return participantsResponse.data;
 
     }
 
     async function addStudyParticipants (newStudyParticipants) {
-        const response = await request.post(`https://human-participant.onrender.com/study-participants/${studyId}`, newStudyParticipants)
+        const response = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${studyId}`, newStudyParticipants)
         fetchStudyParticipants();
         return response.data;
 
@@ -103,7 +103,7 @@ export default function StudyParticipantProvider({children}) {
     async function toggleStudyParticipantsProperty(updateData) {
         
         try {
-            const response = await request.put(`https://human-participant.onrender.com/study-participants/toggle-property`, updateData);
+            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/toggle-property`, updateData);
             if (response.status === 200) {
                 console.log("Successfully toggled property for the selected participants.");
                 // You can update the local state or refetch the data if needed here.
@@ -117,7 +117,7 @@ export default function StudyParticipantProvider({children}) {
     async function toggleParticipantsProperty(updateData) {
         
         try {
-            const response = await request.put(`https://human-participant.onrender.com/participant/toggle-property`, updateData);
+            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/toggle-property`, updateData);
             if (response.status === 200) {
                 console.log("Successfully toggled property for the selected participants.");
                 // You can update the local state or refetch the data if needed here.
@@ -146,7 +146,7 @@ export default function StudyParticipantProvider({children}) {
 
     async function updateStudyParticipant (updatedStudyParticipant) {
         
-        const response = await request.put(`https://human-participant.onrender.com/study-participants/${updatedStudyParticipant._id}`, updatedStudyParticipant);
+        const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${updatedStudyParticipant._id}`, updatedStudyParticipant);
         updateSpecificStudyParticipant(updatedStudyParticipant);
         return response.data;
     }
@@ -154,13 +154,13 @@ export default function StudyParticipantProvider({children}) {
     async function updateParticipant (updatedParticipant) {
         const validatedParticipant = await validateAndUpdateTags(updatedParticipant);
         console.log(validatedParticipant);
-        const response = await request.put(`https://human-participant.onrender.com/participant/${validatedParticipant._id}`, validatedParticipant);
+        const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/${validatedParticipant._id}`, validatedParticipant);
         return response.data;
     }
 
     async function setStudyParticipantNotActive (studyParticipant) {
         studyParticipant.isActive = false;
-        const response = await request.put(`https://human-participant.onrender.com/study-participants/${studyParticipant._id}`, studyParticipant);
+        const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${studyParticipant._id}`, studyParticipant);
         if (response.status === 204) {
             // Remove the studyParticipant from studyParticipants list
             setStudyParticipants(prevParticipants =>
@@ -172,7 +172,7 @@ export default function StudyParticipantProvider({children}) {
 
     async function addTags (newTags) {
 
-        const response = await request.post(`https://human-participant.onrender.com/tag/add`, newTags);
+        const response = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/tag/add`, newTags);
         return response.data.success;
     }
 

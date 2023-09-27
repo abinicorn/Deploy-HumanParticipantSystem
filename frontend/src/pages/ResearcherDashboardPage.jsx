@@ -30,7 +30,7 @@ export default function ResearcherDashboardPage() {
         const fetchData = async () => {
 
                     try {
-                        const studyInfoList = await request.get(`https://human-participant.onrender.com/researcher/studyList/${user.userId}`);
+                        const studyInfoList = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/studyList/${user.userId}`);
 
                         setStudyList(studyInfoList.data);
                     } catch (error) {

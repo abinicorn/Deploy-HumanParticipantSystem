@@ -24,7 +24,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         data: studyInfo,
         isLoadig: studyLoading,
         refresh: refreshStudyContext
-    } = useGet(`https://human-participant.onrender.com/study/${studyIdToUse}`,[]);
+    } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/${studyIdToUse}`,[]);
 
     console.log(studyInfo);
 
@@ -32,7 +32,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         data: researcherList,
         isLoadig: researcherLoading,
         refresh: refreshResearcherContext
-    } = useGet(`https://human-participant.onrender.com/study/researcher/list/${studyIdToUse}`,[]);
+    } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/researcher/list/${studyIdToUse}`,[]);
 
     console.log(researcherList);
 
@@ -44,7 +44,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
     //to do
     async function addResearcher (newResearcher) { 
         try{
-            const researcherResponse = await request.post(`https://human-participant.onrender.com/study/addResearcher/${studyIdToUse}`, newResearcher)
+            const researcherResponse = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/addResearcher/${studyIdToUse}`, newResearcher)
             console.log(researcherResponse);
             refreshResearcherContext();
             return researcherResponse.data;
@@ -55,7 +55,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
 
     async function removeResearcher (studyId, researcherId) {
         try {
-            const response = await request.put(`https://human-participant.onrender.com/study/removeResearcher/${studyIdToUse}/${researcherId}`);
+            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/removeResearcher/${studyIdToUse}/${researcherId}`);
             refreshResearcherContext();
             return response.data;
         } catch (error) {
@@ -68,7 +68,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
 
 
         
-        const response = await request.get(`https://human-participant.onrender.com/researcher/email/${email}`);
+        const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/email/${email}`);
         return response;
     }
 

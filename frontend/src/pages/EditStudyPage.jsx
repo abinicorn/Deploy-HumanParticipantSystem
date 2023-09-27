@@ -54,7 +54,7 @@ export default function EditStudyPage() {
 
     const editStudy = async (studyData) => {
         try {
-            const response = await request.put(`/study/${studyId}`, studyData);
+            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/${studyId}`, studyData);
             return response.data;
         } catch (error) {
             alert(`Error editing study`);

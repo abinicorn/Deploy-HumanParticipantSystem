@@ -47,7 +47,7 @@ export default function HomeActionButton({pageItemId, currentStudy, setStudyList
 
   const handleCloseStudy = async () => {
     try{
-    const response= await request.put(`/study/${pageItemId}`, {isClosed: true});
+    const response= await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/${pageItemId}`, {isClosed: true});
     // setCurrentStudyStatus(false);
     const updatedStudies = studyList.map(study => {
       if (study.studyId === pageItemId) {

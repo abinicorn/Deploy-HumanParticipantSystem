@@ -171,7 +171,6 @@ export default function StudyParticipantProvider({children}) {
     }
 
     async function addTags (newTags) {
-
         const response = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/tag/add`, newTags);
         return response.data.success;
     }
@@ -204,6 +203,114 @@ export default function StudyParticipantProvider({children}) {
         return participant;
     }
 
+    async function handleAddTagToSelectedRows (newTagName) {
+        // 检查新标签是否已存在于 tags 中
+        const tagExists = tags.some(tag => tag.tagName === newTagName);
+        let newTagId = null;
+        if (!tagExists) {
+            // 如果新标签不存在，则添加到 tags 中
+            await addTags({ tags: [{tagName: newTagName}] }).then(addedTags => {
+                // 更新 tags 状态
+                setTags(prevTags => [...prevTags, ...addedTags]);
+                // 获取新标签的 _id
+                newTagId = addedTags[0]?._id || null;
+            });
+        } else {
+            // 获取新标签的 _id
+            newTagId = tags.find(tag => tag.tagName === newTagName)?._id || null;
+        }
+    
+        const updateIds = [];
+
+        // 遍历所有选中的参与者
+        studyParticipants.filter(participant => selectedRows.includes(participant._id))
+        .forEach(participant => {
+            // 检查新标签是否已存在于 tagsInfo 中
+            if (!participant.participantInfo.tagsInfo.includes(newTagName)) {
+
+                updateIds.push(participant.participantInfo._id);
+
+                // 如果不存在，则更新 tagsInfo 和 tag
+                const updatedParticipant = {
+                    ...participant,
+                    participantInfo: {
+                        ...participant.participantInfo,
+                        tagsInfo: [...participant.participantInfo.tagsInfo, newTagName],
+                        tag: [...participant.participantInfo.tag, newTagId]
+                    }
+                };
+                // 使用 updateSpecificStudyParticipant 方法保存更改
+                updateSpecificStudyParticipant(updatedParticipant);
+            }
+        })
+
+        if (updateIds.length > 0) {
+            const updatePayload = {
+                updateIds: updateIds,
+                tagId: newTagId
+            };
+
+            console.log(updatePayload)
+            
+            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/update-tag`, updatePayload);
+            if (response) {
+                console.log(`Added ${newTagName} tag to ${response.data} participants`);
+            } else {
+                console.log(`Failed to add ${newTagName} tag to selected participants`);
+            }
+            
+        }
+    };
+
+    async function handleRemoveTagFromSelectedRows(tagNameToRemove) {
+
+        const removeTagId = tags.find(tag => tag.tagName === tagNameToRemove)?._id || null;
+        const deleteIds = [];
+        // 遍历所有选中的参与者
+        studyParticipants.filter(participant => selectedRows.includes(participant._id))
+        .forEach(participant => {
+            // 检查要删除的标签是否存在于 tagsInfo 中
+            if (participant.participantInfo.tagsInfo.includes(tagNameToRemove)) {
+
+                deleteIds.push(participant.participantInfo._id);
+
+                // 如果存在，则从 tagsInfo 和 tag 中移除
+                const updatedTagsInfo = participant.participantInfo.tagsInfo.filter(tagName => tagName !== tagNameToRemove);
+                const updatedTag = participant.participantInfo.tag.filter(tagId => tagId !== removeTagId);
+                
+                const updatedParticipant = {
+                    ...participant,
+                    participantInfo: {
+                        ...participant.participantInfo,
+                        tagsInfo: updatedTagsInfo,
+                        tag: updatedTag
+                    }
+                };
+                
+                // 使用 updateSpecificStudyParticipant 方法保存更改
+                updateSpecificStudyParticipant(updatedParticipant);
+            }
+        });
+
+        if (deleteIds.length > 0) {
+            const deletePayload = {
+                deleteIds: deleteIds,
+                tagId: removeTagId
+            };
+
+            console.log(deletePayload)
+            
+            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/delete-tag`, deletePayload);
+            if (response) {
+                console.log(`Deleteded ${tagNameToRemove} tag from ${response.data} participants`);
+            } else {
+                console.log(`Failed to delete ${tagNameToRemove} tag to selected participants`);
+            }
+            
+        }
+    }
+        
+
     
     const context = {
         studyParticipants,
@@ -219,6 +326,8 @@ export default function StudyParticipantProvider({children}) {
         finalUpdateStudyParticipant,
         setStudyParticipantNotActive,
         fetchTags,
+        handleAddTagToSelectedRows,
+        handleRemoveTagFromSelectedRows,
         selectedRows, 
         setSelectedRows,
         isAnonymous, 

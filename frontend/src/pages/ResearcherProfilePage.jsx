@@ -12,7 +12,7 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Fade
+    Fade, Alert
 } from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {useCurrentUser} from "../hooks/useCurrentUser";
@@ -133,13 +133,14 @@ export default function ResearcherProfilePage() {
             id: user.userId
         }
 
+
         request.put(url, req)
             .then(response => {
                 alert(response.data.message);
-                navigate(0);
             })
             .catch(error => {
-                console.error('Error updating user info', error);
+                alert('Current password error');
+                console.error(error);
             });
 
 
@@ -151,8 +152,9 @@ export default function ResearcherProfilePage() {
             <Navbar/>
             <CssBaseline />
 
+            <div style={{ paddingTop: '80px'}}>
             <Container sx={{
-                marginTop: '10px',
+                marginTop: '30',
                 width:"1500"
             }}
             >
@@ -362,6 +364,7 @@ export default function ResearcherProfilePage() {
                 </Box>
 
             </Container>
+            </div>
         </div>
     );
 }

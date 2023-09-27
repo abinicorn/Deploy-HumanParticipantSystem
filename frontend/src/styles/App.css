@@ -53,3 +53,11 @@
   justify-content: right !important;
   margin: 10px;
 }
+
+.background-image {
+  background-image: url('../assets/University\ of\ Auckland\ Building.jpg');
+  background-size: cover;
+  min-height: 100%;
+  height: 100vh;
+  opacity: 0.7;
+}

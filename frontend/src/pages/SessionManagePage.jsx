@@ -1,14 +1,11 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
 import CreateEditSession from '../components/Session/CreateEditSession';
 import SessionActionButton from '../components/Button/SessionActionButton';
 import { SessionContext } from '../providers/SessionContextProvider';
 import { GridToolbar  } from '@mui/x-data-grid';
 import { StyledDataGrid } from '../styles/StyledDataGrid';
 import SessionArchive from '../components/Session/SessionArchive';
-import { CurrentUserContextProvider } from '../providers/CurrentUserProvider';
 import { CustomNoRowsOverlaySession } from '../styles/CustomNoRowsOverlay';
 import { StudyResearcherContext } from '../providers/StudyResearcherContextProvider';
 
@@ -30,13 +27,7 @@ export default function SessionManagePage() {
 
     return (
         <div>
-          <Box sx={{ display: 'flex'}}>
-            <CurrentUserContextProvider>
-              <Navbar/>
-              <Sidebar isSession={true}/>
-            </CurrentUserContextProvider>
-          </Box>
-          <Box marginLeft={35} marginRight={23} marginTop={10}>
+          <Box paddingLeft={5} paddingRight={5}>
             <h1>Session Management</h1>
             <h1>{studyInfo.studyName} (Study Code: {studyInfo.studyCode})</h1>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end'}}>

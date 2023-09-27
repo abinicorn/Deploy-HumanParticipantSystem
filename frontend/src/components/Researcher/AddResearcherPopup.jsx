@@ -8,6 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { StudyResearcherContext } from '../../providers/StudyResearcherContextProvider';
 import ConfirmPopup from '../Popup/ConfirmPopup';
+import { checkEmailValidation } from '../../utils/checkEmailValidation';
 
 
 export default function AddResearcherPopup() {
@@ -29,12 +30,21 @@ export default function AddResearcherPopup() {
     
 
     const handleAdd = async () => {
+        if (!firstName || !lastName || !email) {
+            alert("Please fill in all required fields.");
+            return;
+        }
 
+        if (!checkEmailValidation(email)) {
+            alert("Please enter a valid email address.");
+            return;
+        }
         const response= await addResearcher({ firstName, lastName, email });
-        setUsername(response.username);
-        alert(`The researcher has been added! Username is ${response.username}, the default password is 123456`);
-        handleClose();
-
+        if(response){
+            setUsername(response.username);
+            alert(`The researcher has been added! Username is ${response.username}, the default password is 123456`);
+            handleClose();
+        }
     };
 
 
@@ -64,6 +74,9 @@ export default function AddResearcherPopup() {
                 type="text"
                 fullWidth
                 variant="standard"
+                onKeyDown = {(e) => {
+                    e.stopPropagation();
+                    }}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
             />
@@ -76,6 +89,9 @@ export default function AddResearcherPopup() {
                 type="text"
                 fullWidth
                 variant="standard"
+                onKeyDown = {(e) => {
+                    e.stopPropagation();
+                    }}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
             />
@@ -88,6 +104,9 @@ export default function AddResearcherPopup() {
                 type="email"
                 fullWidth
                 variant="standard"
+                onKeyDown = {(e) => {
+                    e.stopPropagation();
+                    }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />

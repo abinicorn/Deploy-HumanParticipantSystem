@@ -141,7 +141,7 @@ export default function HomeActionButton({pageItemId, currentStudy, setStudyList
                     </MenuItem>
                     <MenuItem key={4}>
                       <ListItemIcon>{actionList[4].icon}</ListItemIcon>                        
-                      <StudyReportPopup currentStudy={currentStudy}/>
+                      <StudyReportPopup currentStudy={currentStudy} studyId={pageItemId}/>
                     </MenuItem>
                     <MenuItem key={5} disabled={!currentStudy.status}> 
                       <ListItemIcon>{actionList[5].icon}</ListItemIcon>                        

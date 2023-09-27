@@ -2,11 +2,11 @@ import React, { useState, useContext } from 'react';
 import { Dialog, DialogTitle, DialogContent, Typography, Button, Box } from '@mui/material';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
-export default function MailingList({ context, selectedRows }) {
-    const [open, setOpen] = useState(false);
+export default function MailingList({ context, selectedRows, open, onClose }) {
+    // const [open, setOpen] = useState(false);
     // Convert the participants' emails into a comma-separated string
     const {studyParticipants} = useContext(context);
-    let emails = 'Mailing list is empty.'
+    let emails = 'Mailing list is empty. Select participants to get their mailing list.'
     // if (studyParticipants && studyParticipants.length > 0) {
     //     emails = studyParticipants.map(sp => sp.participantInfo.email).join(', ');
     // }
@@ -18,22 +18,25 @@ export default function MailingList({ context, selectedRows }) {
                     .join(', ');
     }
 
-    const handleOpen = () => {
-        setOpen(true);
-    };
+    // const handleOpen = () => {
+    //     setOpen(true);
+    // };
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+    // const handleClose = () => {
+    //     setOpen(false);
+    //     if (onClose) onClose();
+    // };
 
     return (
         <div>
             {/* This button will open the mailing list dialog */}
-            <Button variant="contained" color="primary" onClick={handleOpen} startIcon={<MailOutlineIcon />}>
+            {/* <Button variant="contained" color="primary" onClick={handleOpen} startIcon={<MailOutlineIcon />}>
                 Show Mailing List
-            </Button>
+            </Button> */}
 
-            <Dialog open={open} onClose={handleClose} fullWidth>
+            {/* <Typography textAlign="center" onClick={handleOpen}>Show Mailing List</Typography> */}
+
+            <Dialog open={open} onClose={onClose} fullWidth>
                 <DialogTitle align="center">
                     <Typography variant="h5" component="div" color="primary" style={{ marginBottom: '20px' }}>
                         <strong>Mailing List</strong>
@@ -57,7 +60,7 @@ export default function MailingList({ context, selectedRows }) {
                     />
                 </DialogContent>
                 <Box display="flex" justifyContent="center" marginTop={2} style={{ padding: '20px'}}>
-                    <Button variant="contained" color="primary" onClick={handleClose}>
+                    <Button variant="contained" color="primary" onClick={onClose}>
                         Close
                     </Button>
                 </Box>

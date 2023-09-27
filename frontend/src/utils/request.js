@@ -8,8 +8,6 @@ export const request = axios.create({
     },
 });
 
-
-
 request.interceptors.request.use(
     (config) => {
         const accessToken = tokenService.getToken(TokenType.ACCESS_TOKEN);
@@ -32,26 +30,29 @@ request.interceptors.request.use(
     }
 );
 
-// request.interceptors.response.use(
-//     (response) => {
-//         return response;
-//     },
-//     async (error) => {
-//         const originalRequest = error.config;
-//
-//         if (error.response.status === 401 && !originalRequest._retry) {
-//             originalRequest._retry = true;
-//             try {
-//                 await authService.refreshToken();
-//             } catch (_) {
-//                 tokenService.clearAllTokens();
-//                 window.location.href = ScreenPath.Login;
-//                 return;
-//             }
-//
-//             return request(originalRequest);
-//         }
-//
-//         return Promise.reject(error.response.data);
-//     }
-// );
+request.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    async (error) => {
+        // if (error.response === undefined){
+        //     alert('Sever error');
+        //     return Promise.reject(error);
+        // }
+        if (error.message && (error.message.includes("Network Error") || error.message.includes("Connection Refused"))) {
+            alert("Network error: Unable to connect to the server. Please check your internet connection and try again.");
+            window.location.href = "/";
+            return Promise.reject(error);
+        }
+
+
+        if (error.response.status === 402) {
+            alert("Token has expired, please log in again.");
+            window.location.href = "/";
+        }
+
+        return Promise.reject(error);
+    }
+);
+
+

@@ -123,6 +123,7 @@ export default function CreateEditSession({create, targetSessionId}) {
     })
     setRight([])
     if(studyParticipantInfo) {
+      studyParticipantInfo.sort((a,b) => a.serialNum - b.serialNum);
       setLeft(studyParticipantInfo);
     }
     setOpen(true);
@@ -130,9 +131,6 @@ export default function CreateEditSession({create, targetSessionId}) {
 
   const handleEditClickOpen = () => {
     
-    if(studyParticipantInfo) {
-      setLeft(studyParticipantInfo);
-    }
     setSessionContent({
       _id: targetSession._id,
       studyId: targetSession.studyId,
@@ -142,6 +140,7 @@ export default function CreateEditSession({create, targetSessionId}) {
       location: targetSession.location, 
       participantNum: targetSession.participantNum,
     })
+
     let editParticipantList =[]
     if(studyParticipantInfo) {
       editParticipantList = studyParticipantInfo.reduce(
@@ -151,8 +150,16 @@ export default function CreateEditSession({create, targetSessionId}) {
             : result,
         []
       );
+      editParticipantList.sort((a,b) => a.serialNum - b.serialNum)
     }
     setRight(editParticipantList);
+    
+    let editStudyParticipantList = []
+    if(studyParticipantInfo) {
+      editStudyParticipantList = studyParticipantInfo.filter(function(el) {return !editParticipantList.includes(el)});
+      editStudyParticipantList.sort((a,b) => a.serialNum - b.serialNum)
+    }
+    setLeft(editStudyParticipantList);
     setOpen(true);
   };
   
@@ -162,6 +169,11 @@ export default function CreateEditSession({create, targetSessionId}) {
 
   const handleCreate = () => {
     
+    if (!sessionContent.date|| !sessionContent.time || !sessionContent.location || !sessionContent.participantNum) {
+      alert("Please fill in all required fields.");
+      return
+    }
+
     const newSessionCode = generateUniqueCode();
     sessionContent['sessionCode'] = newSessionCode
 

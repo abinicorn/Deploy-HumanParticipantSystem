@@ -1,37 +1,34 @@
-import * as React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import {useEffect, useState} from "react";
+import * as React from "react";
+import {request} from "../../utils/request";
+import parseData from "../../utils/parseData";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import parseData from "../../utils/parseData";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
-import {useEffect, useState} from "react";
-import {request} from "../../utils/request";
+import {CustomNoRowsOverlaySession} from "../../styles/CustomNoRowsOverlay";
+import {StyledDataGrid} from "../../styles/StyledDataGrid";
 
 
-export default function StudyReportPopup({currentStudy, studyId}) {
+export default function StudyReport({data}){
+
+    const [study, setStudyData] = useState(data);
 
 
-    const [study, setStudy] = React.useState(currentStudy);
 
-
-    const [open, setOpen] = React.useState(false);
-    const scroll ='paper';
-
-
-    // Session
     const [sessionList, setSessionList] = React.useState(null);
-
 
 
     useEffect(() => {
 
         const fetchData = async () => {
             try {
-                const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/session/list/${studyId}`);
+
+
+                const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/session/list/${study.studyId}`);
 
                 setSessionList(response.data);
-
 
 
 
@@ -41,8 +38,6 @@ export default function StudyReportPopup({currentStudy, studyId}) {
         };
         fetchData();
     }, [study]);
-
-
 
     const sessionRows = (sessionList || []).map((sessionInfo, index) => ({
         id: index + 1,
@@ -65,8 +60,6 @@ export default function StudyReportPopup({currentStudy, studyId}) {
     ]
 
 
-
-
     // Participants
     const [studyParticipants, setStudyParticipants] = useState([]);
 
@@ -83,7 +76,7 @@ export default function StudyReportPopup({currentStudy, studyId}) {
 
 
     async function fetchStudyParticipants() {
-        const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${studyId}`);
+        const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${study.studyId}`);
         setStudyParticipants(response.data);
     };
 
@@ -98,7 +91,6 @@ export default function StudyReportPopup({currentStudy, studyId}) {
         willingToReceiveReport: participantInfo.isWIllReceiveReport ? 'Yes' : 'No'
     }));
 
-
     const participantsColumns = [
         { field: 'serialNo', headerName: 'Serial No.', flex: 0.5, headerAlign: 'center', align:'center'},
         { field: 'email', headerName: 'Email', flex: 2, headerAlign: 'center', align:'center'},
@@ -106,19 +98,6 @@ export default function StudyReportPopup({currentStudy, studyId}) {
         { field: 'winGift', headerName: 'Win Gift', flex: 1, headerAlign: 'center', align:'center'},
         { field: 'willingToReceiveReport', headerName: ' Receive the final report', flex: 1, headerAlign: 'center', align:'center'},
     ];
-
-
-
-
-
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
 
 
     const exportData = () => {
@@ -172,27 +151,14 @@ export default function StudyReportPopup({currentStudy, studyId}) {
     };
 
 
-
-
     return (
         <div>
-            <Typography textAlign="center" onClick={handleClickOpen}>Generate Report</Typography>
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                scroll={scroll}
-                aria-labelledby="scroll-dialog-title"
-                aria-describedby="scroll-dialog-description"
-                maxWidth="lg"
-                fullWidth
-            >
-                <DialogTitle id="scroll-dialog-title">Summary Report</DialogTitle>
 
 
-                <DialogContent dividers={scroll === 'paper'}>
-
-                    <Paper sx={{ padding: '20px', width: '100%' }} elevation={3} className="study-info-popup">
                         <Grid container spacing={2} alignItems="center" justifyContent="flex-start">
+                            <Grid item xs={12} align="right">
+                                <Button variant="contained" onClick={exportData}>Export JSON</Button>
+                            </Grid>
                             <Grid item xs={12} align="center">
                                 <Typography variant="h3">{study.name} ({study.studyCode})</Typography>
                             </Grid>
@@ -222,60 +188,104 @@ export default function StudyReportPopup({currentStudy, studyId}) {
                                 Date: &nbsp;{parseData(study.createdAt)}
                             </span>
                                 </Typography>
+                            </Grid>
+
+                            <Grid item xs={12} align="left">
                                 <Typography variant="h5" style={{ marginBottom: '10px' }}>Location: &nbsp;{study.location.join('; ')}</Typography>
+                            </Grid>
+
+                            <Grid item xs={12} align="left">
+                                <Typography variant="h5" style={{ marginBottom: '10px' }}>Survey Link: &nbsp;{study.surveyLink}</Typography>
+                            </Grid>
+                            <Grid item xs={12} align="left">
+                                <Typography variant="h5" style={{ marginBottom: '10px' }}>Drive Link: &nbsp;{study.driveLink}</Typography>
+                            </Grid>
+                            <Grid item xs={12} align="left">
+                                <Typography variant="h5" style={{ marginBottom: '10px' }}>Status: &nbsp;{study.status ? 'Active' : 'Close'}</Typography>
                             </Grid>
 
 
                             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '50px', width: '100%' }}>
                                 <Paper sx={{ flex: 1, width: '100%' }}>
-                                    <Grid item xs={12} align="center">
-                                        <div style={{ height: '100%' }}>
-                                            <Typography variant="h5" style={{ marginBottom: '10px' }}>Session List</Typography>
-                                            <DataGrid
-                                                rows={sessionRows}
-                                                columns={sessionColumns}
-                                                pageSize={5}
-                                                rowsPerPageOptions={[5, 10, 20]}
-                                                components={{
-                                                    Toolbar: GridToolbar,
-                                                }}
-                                                checkboxSelection
-                                            />
-                                        </div>
+                                    <Grid container alignItems="center" justifyContent="center">
+                                        <Typography variant="h5" style={{ marginTop: '10px' }}>Session List</Typography>
                                     </Grid>
+
+                                    <StyledDataGrid
+                                        sx={{
+                                            height: "65vh",
+                                            maxWidth: '100vw',
+                                            overflowY: 'auto',
+                                            overflowX: 'hidden',
+                                            marginTop: 2,
+                                            '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                                            '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                                            '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
+                                        }}
+                                        rows={sessionRows}
+                                        columns={sessionColumns}
+                                        initialState={{
+                                            pagination: {
+                                                paginationModel: { page: 0, pageSize: 10 },
+                                            },
+                                        }}
+                                        pageSizeOptions={[10, 25, 50]}
+                                        slots={{
+                                            noRowsOverlay: CustomNoRowsOverlaySession,
+                                            toolbar: GridToolbar
+                                        }}
+                                        disableSelectionOnClick
+                                        hideFooterSelectedRowCount
+                                        checkboxSelection
+                                    />
+
                                 </Paper>
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                                 <Paper sx={{ flex: 1, width: '100%' }}>
-                                    <Grid item xs={12} align="center">
-                                        <div style={{ height: '100%' }}>
-                                            <Typography variant="h5" style={{ marginBottom: '10px' }}>Participant List</Typography>
-                                            <DataGrid
-                                                rows={participantsRows}
-                                                columns={participantsColumns}
-                                                pageSize={5}
-                                                rowsPerPageOptions={[5, 10, 20]}
-                                                components={{
-                                                    Toolbar: GridToolbar,
-                                                }}
-                                                checkboxSelection
-                                            />
-                                        </div>
+                                    <Grid container alignItems="center" justifyContent="center">
+                                        <Typography variant="h5" style={{ marginTop: '10px' }}>
+                                            Participant List
+                                        </Typography>
                                     </Grid>
+
+                                    <StyledDataGrid
+                                        sx={{
+                                            height: "65vh",
+                                            maxWidth: '100vw',
+                                            overflowY: 'auto',
+                                            overflowX: 'hidden',
+                                            marginTop: 2,
+                                            '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                                            '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                                            '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
+                                        }}
+                                        rows={participantsRows}
+                                        columns={participantsColumns}
+                                        initialState={{
+                                            pagination: {
+                                                paginationModel: { page: 0, pageSize: 10 },
+                                            },
+                                        }}
+                                        pageSizeOptions={[10, 25, 50]}
+                                        slots={{
+                                            noRowsOverlay: CustomNoRowsOverlaySession,
+                                            toolbar: GridToolbar
+                                        }}
+                                        disableSelectionOnClick
+                                        hideFooterSelectedRowCount
+                                        checkboxSelection
+                                    />
+
                                 </Paper>
                             </div>
 
 
+
                         </Grid>
-                    </Paper>
-                </DialogContent>
-                <DialogActions>
-                    <Button variant="contained" onClick={exportData}>Export JSON</Button>
-                    <Button variant="contained" onClick={handleClose}>Close</Button>
-                </DialogActions>
-            </Dialog>
+
+
         </div>
     )
-
 }

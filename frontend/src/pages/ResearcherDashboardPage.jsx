@@ -12,8 +12,12 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Navbar from '../components/Navbar';
-import {tokenService, TokenType} from "../services/tokenService";
 import {request} from "../utils/request";
+import { Link } from 'react-router-dom';
+import {CustomNoRowsOverlayDashboard} from "../styles/CustomNoRowsOverlay";
+import {StyledDataGrid} from "../styles/StyledDataGrid";
+
+
 
 
 
@@ -85,23 +89,6 @@ export default function ResearcherDashboardPage() {
     };
 
 
-    const [isReportPopupOpen, setIsReportPopupOpen] = useState(false);
-
-
-    const handleStudyReportClosePopup = () => {
-        setSelectedStudy(null);
-        setIsReportPopupOpen(false);
-    };
-
-    const handleReportClick = (item) => {
-        setSelectedStudy(item);
-        setIsReportPopupOpen(true);
-    };
-
-
-
-
-
     function LinearProgressWithLabel(props) {
         return (
                 <Box sx={{ width: '100%', mr: 1 }}>
@@ -121,7 +108,27 @@ export default function ResearcherDashboardPage() {
             flex: 1,
             headerClassName: 'App-Font',
             renderCell: (params) => (
-                <a href="#/" onClick={() => handleNameClick(params.row)}> {params.row.name} </a>
+                // <a href="#/" onClick={() => handleNameClick(params.row)}> {params.row.name} </a>
+                //  <a href={`/studyInfo/${params.row.studyId}`}>{params.row.name}</a>
+
+                // <Link to={{
+                //     pathname: `/studyInfo/${params.row.studyId}`,
+                //
+                //     state: '111'
+                // }}>{params.row.name}</Link>
+                <div
+                    onClick={() => {
+                        navigate(`/studyInfo/${params.row.studyId}`, {
+                            state: { study: params.row },
+                        });
+                    }}
+                    style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                >
+                    {params.row.name}
+                </div>
+
+
+
             ),
             width: 200,
         },
@@ -159,23 +166,22 @@ export default function ResearcherDashboardPage() {
                     )}
                 </div>
             ),
-            width: 120, // 设置 'Status' 列的宽度为 120 像素
+            width: 120,
         },
-        {
-            field: 'studyId',
-            headerName: 'Action',
-            flex: 1,
-            headerClassName: 'App-Font',
-            renderCell: (params) =>
-            // console.log(params.row.studyId)
-                    <HomeActionButton 
-                        pageItemId={params.row.studyId} 
-                        currentStudy={params.row} 
-                        setStudyList={setStudyList}
-                        studyList={studyList}
-                    />
-
-        },
+        // {
+        //     field: 'studyId',
+        //     headerName: 'Action',
+        //     flex: 1,
+        //     headerClassName: 'App-Font',
+        //     renderCell: (params) =>
+        //             <HomeActionButton
+        //                 pageItemId={params.row.studyId}
+        //                 currentStudy={params.row}
+        //                 setStudyList={setStudyList}
+        //                 studyList={studyList}
+        //             />
+        //
+        // },
     ];
 
 
@@ -185,6 +191,23 @@ export default function ResearcherDashboardPage() {
 
     }
 
+    // Component where you want to navigate from
+
+
+        // const handleButtonClick = () => {
+        //     // Assuming you want to send an object as a prop
+        //     const objToSend = { name: 'John Doe', age: 25 };
+        //
+        //     // Navigate to PageTwo and send the object as a prop
+        //
+        //     navigate(url, {
+        //         state: { objToSend } }
+        //     })
+        //
+        // };
+
+
+
 
 
     return (
@@ -192,46 +215,62 @@ export default function ResearcherDashboardPage() {
         <div>    
             <Navbar/> 
             <CssBaseline />
+            <div style={{marginLeft:'5%', marginRight: '5%'}}>
+                <Grid container spacing={-20}
+                        alignItems="center"
+                        marginTop='5%'
+                        marginBottom = '0.5%'
+                        justifyContent="flex-end"
+                >
+                    <Button sx={{
+                        marginRight: '-7%',
+                        fontSize: '16px',
+                    }} disableElevation
+                            variant="contained"
+                            aria-label="Disabled elevation buttons"
+                            onClick={handleCreateStudy}
 
-            <Grid container spacing={-20}
-                    alignItems="center"
-                    marginTop='5%'
-                    marginBottom = '0.5%'
-                    justifyContent="flex-end"
-            >
-                <Button sx={{
-                    marginRight: '-7%',
-                    fontSize: '16px',
-                }} disableElevation
-                        variant="contained"
-                        aria-label="Disabled elevation buttons"
-                        onClick={handleCreateStudy}
+                    >Create Study</Button>
+                </Grid>
 
-                >Create Study</Button>
-            </Grid>
-
-
-
-
-            <div style={{ height: '80vh' }}>
-                <DataGrid
+                <div style={{ height: '100vh' }}>
+                <StyledDataGrid
+                    sx={{
+                        height: "80vh",
+                        maxWidth: '100vw',
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        marginTop: 2,
+                        '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                        '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                        '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
+                    }}
                     rows={rows}
                     columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5, 10, 20]}
-                    components={{
-                        Toolbar: GridToolbar,
+                    initialState={{
+                        pagination: {
+                            paginationModel: { page: 0, pageSize: 10 },
+                        },
                     }}
+                    pageSizeOptions={[10, 25, 50]}
+                    slots={{
+                        noRowsOverlay: CustomNoRowsOverlayDashboard,
+                        toolbar: GridToolbar
+                    }}
+                    disableSelectionOnClick
+                    hideFooterSelectedRowCount
                 />
+                </div>
+
+
+
+                {isStudyDetailPopupOpen && (
+                    <StudyDetailPopup study={selectedStudy} onClose={handleStudyDetailClosePopup} open={isStudyDetailPopupOpen}/>
+                )}
+
+
+
             </div>
-
-
-            {isStudyDetailPopupOpen && (
-                <StudyDetailPopup study={selectedStudy} onClose={handleStudyDetailClosePopup} open={isStudyDetailPopupOpen}/>
-            )}
-
-
-
         </div>
 
     );

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, ClickAwayListener, Grow, Paper, Popper, MenuItem, MenuList, ListItemIcon, Box } from '@mui/material';
+import { Button, ClickAwayListener, Grow, Paper, Popper, MenuItem, MenuList, ListItemIcon, Box, ListItemText } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -102,11 +102,15 @@ export default function SessionActionButton({pageItemId}) {
                   >                    
                     <MenuItem key={0}> 
                       <ListItemIcon>{actionList[0].icon}</ListItemIcon>
-                      <CreateEditSession create={false} targetSessionId={pageItemId}/>                
+                      <ListItemText>
+                        <CreateEditSession create={false} targetSessionId={pageItemId}/>
+                      </ListItemText>   
                     </MenuItem>
                     <MenuItem key={1}>
                       <ListItemIcon>{actionList[1].icon}</ListItemIcon>
-                      <SessionParticipantList targetSessionId={pageItemId}/>
+                      <ListItemText>
+                        <SessionParticipantList targetSessionId={pageItemId}/>
+                      </ListItemText>
                     </MenuItem> 
                     <MenuItem key={2}>
                       <ListItemIcon>{actionList[2].icon}</ListItemIcon>
@@ -122,12 +126,3 @@ export default function SessionActionButton({pageItemId}) {
 
   );
 }
-
-/*
-{actionList.map((actionList, index) => (
-  <MenuItem key={index} onClick={handleMenuItem}> 
-      <ListItemIcon>{actionList.icon}</ListItemIcon>                        
-      <Typography textAlign="center">{actionList.title}</Typography>
-  </MenuItem>
-))}
-*/

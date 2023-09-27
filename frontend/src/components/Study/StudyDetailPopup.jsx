@@ -42,7 +42,7 @@ export default function StudyDetailPopup({ study, onClose, open }) {
                     <Grid item xs={12} align="left">
                         <Typography variant="h5">Description:</Typography>
                         <Paper elevation={0} sx={{ padding: '10px' }}>
-                            <Box sx={{ backgroundColor: '#2196f3', padding: '10px', borderRadius: '4px' }}>
+                            <Box sx={{ padding: '10px', borderRadius: '4px' }}>
                                 <Typography variant="body1">{study.description}</Typography>
                             </Box>
                         </Paper>
@@ -58,12 +58,12 @@ export default function StudyDetailPopup({ study, onClose, open }) {
                         <Typography variant="h5" style={{ marginBottom: '10px' }}>Location: &nbsp;{study.location.join('; ')}</Typography>
                     </Grid>
                     <Grid item xs={12} align="left">
-                        <a href="/session" style={{ textDecoration: 'none' }}>
+                        <a href={`/session/${study.studyId}`} style={{ textDecoration: 'none' }}>
                             <Button variant="contained" color="secondary">Session List</Button>
                         </a>
                     </Grid>
                     <Grid item xs={12} align="left">
-                        <a href="/session" style={{ textDecoration: 'none' }}>
+                        <a href={`/study-participants/${study.studyId}`} style={{ textDecoration: 'none' }}>
                             <Button variant="contained" color="secondary">Participant List</Button>
                         </a>
                     </Grid>

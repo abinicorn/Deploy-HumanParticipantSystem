@@ -152,20 +152,7 @@ export default function AddParticipant({ study_id }) {
     };
 
     const assembleParticipantsData = async () => {
-        const csvData = await parseUploadedFiles();
-        console.log(csvData);
-    
-        // participants in csv files
-        const csvParticipants = csvData.map(data => ({
-            firstName: data.FirstName,
-            lastName: data.LastName,
-            email: data.Email,
-            phoneNum: data.PhoneNum,
-            isWillContact: data.IsWillContact.toLowerCase() === 'true' ? true : false
-        }));
-    
-        console.log(csvParticipants);
-    
+
         // participant input by manual
         let manualParticipant = {};
         if (email) {
@@ -178,6 +165,23 @@ export default function AddParticipant({ study_id }) {
             };
         }
 
+        if  (files.length == 0) {
+            return { participants: [manualParticipant] };
+        }
+
+        const csvData = await parseUploadedFiles();
+        console.log(csvData);
+    
+        // participants in csv files
+        const csvParticipants = csvData.validData.map(data => ({
+            firstName: data.FirstName,
+            lastName: data.LastName,
+            email: data.Email,
+            phoneNum: data.PhoneNum,
+            isWillContact: data.IsWillContact && data.IsWillContact.toLowerCase() === 'true' ? true : false
+        }));
+    
+        console.log(csvParticipants);
     
         // Combine both
         const allParticipants = [manualParticipant, ...csvParticipants];
@@ -201,8 +205,8 @@ export default function AddParticipant({ study_id }) {
             const newParticipants = await assembleParticipantsData();
             console.log(newParticipants);
     
-            // use to add participants
-            const actionResult1 = await addParticipants(newParticipants.validData);
+            //use to add participants
+            const actionResult1 = await addParticipants(newParticipants);
     
             if (actionResult1) {
                 console.log("Participant data received", actionResult1);
@@ -233,7 +237,7 @@ export default function AddParticipant({ study_id }) {
     return (
         <div>
             <Button variant="contained" color="primary" onClick={handleOpen} startIcon={<AddIcon />}>
-                Add New Participant
+                Add New Participants
             </Button>
 
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
@@ -316,7 +320,10 @@ export default function AddParticipant({ study_id }) {
                             </ListItem>
                         ))}
                     </List>
-                    <Grid container direction="column" alignItems="center" style={{ marginTop: '20px' }}>
+                    <Grid container direction="column" alignItems="center" style={{ marginTop: '20px'}}>
+                        <Typography variant="body2" color="error" style={{ marginBottom: '5px' }}>
+                            Please ensure the CSV file contains at least an "Email" column.
+                        </Typography>
                         <Button
                             variant="contained"
                             component="label"

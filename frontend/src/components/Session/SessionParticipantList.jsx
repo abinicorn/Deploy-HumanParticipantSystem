@@ -34,7 +34,7 @@ export default function SessionParticipantList({ targetSessionId }) {
 
     return (
         <div>
-            <Typography textAlign="center" onClick={handleClickOpen}>View participant</Typography>
+            <Typography textAlign="center" onClick={handleClickOpen}>View participants</Typography>
             <Dialog
                 open={open}
                 onClose={handleClose}

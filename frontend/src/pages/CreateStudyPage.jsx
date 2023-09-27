@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import EditStudyTemplate from '../components/Study/EditStudyTemplate';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import {request} from "../utils/request";
+import Navbar from '../components/Navbar';
 
 export default function CreateStudyPage() {
 
@@ -26,20 +27,20 @@ export default function CreateStudyPage() {
         driveLink: ''
     });
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         setStudyData({
             ...studyData,
             creator: researcherId
         });
-        createStudy(studyData)
-            .then((res) => {
-                navigate(`../${res.study._id}`);
-            })
-            .catch((error) => {
-                console.log('Error creating study', error);
-            })
-        alert('Study saved successfully!');
+        try {
+            const response = await createStudy(studyData);
+            alert('Study saved successfully!');
+            navigate('/homepage');
+        } catch (error) {
+            alert(error?.response?.data?.message?? "Error saving study")
+            console.log("Error", error);
+        }
     };
 
     const createStudy = async (studyData) => {
@@ -54,12 +55,15 @@ export default function CreateStudyPage() {
     };
 
     return (
+        <>
+        <Navbar/>
         <EditStudyTemplate
             isEditMode={false}
             studyData={studyData}
             setStudyData={setStudyData}
             handleSubmit={handleSubmit}
         />
+        </>
     );
 
 

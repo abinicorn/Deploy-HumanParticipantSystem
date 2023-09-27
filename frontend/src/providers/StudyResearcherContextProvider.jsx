@@ -26,15 +26,19 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         refresh: refreshStudyContext
     } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/${studyIdToUse}`,[]);
 
-    console.log(studyInfo);
-
     const{
         data: researcherList,
         isLoadig: researcherLoading,
         refresh: refreshResearcherContext
     } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/researcher/list/${studyIdToUse}`,[]);
 
-    console.log(researcherList);
+    const {
+        data: allResearchers,
+        isLoadig: allResearchersLoading,
+        refresh: refreshAllResearchersContext
+    } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/allResearchers`,[]);
+    
+
 
     React.useEffect(() => {
         refreshStudyContext();
@@ -65,9 +69,6 @@ function StudyResearcherContextProvider({pageItemId, children}) {
 
 
     async function fetchResearcherbyEmail (email) {
-
-
-        
         const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/email/${email}`);
         return response;
     }
@@ -79,6 +80,9 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         researcherList,
         researcherLoading,
         refreshResearcherContext,
+        allResearchers,
+        allResearchersLoading,
+        refreshAllResearchersContext,
         addResearcher,
         removeResearcher,
         fetchResearcherbyEmail

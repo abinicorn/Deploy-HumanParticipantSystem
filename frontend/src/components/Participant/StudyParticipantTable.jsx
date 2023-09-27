@@ -1,9 +1,8 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Chip, Typography, Box, Button, Menu, MenuItem } from '@mui/material';
+import {Chip, Typography, Box, Button, Menu, MenuItem, TextField } from '@mui/material';
 import {styled} from '@mui/material/styles'
 import { DataGrid, GridToolbar, GRID_CHECKBOX_SELECTION_COL_DEF, gridPageCountSelector,
 GridPagination, useGridApiContext, useGridSelector } from '@mui/x-data-grid';
-import MuiPagination from '@mui/material/Pagination';
 
 import EditParticipant from './EditParticipant';
 import CloseCircleButton from '../Button/CloseCircleButton';
@@ -26,8 +25,8 @@ export default function ParticipantsTable() {
     console.log("Start to render datagrid");
 
     const {studyParticipants, finalUpdateStudyParticipant, toggleStudyParticipantsProperty, 
-          toggleParticipantsProperty, isAnonymous, selectedRows, setSelectedRows, 
-          setStudyParticipantNotActive} = useContext(StudyParticipantContext);
+          toggleParticipantsProperty, handleAddTagToSelectedRows, handleRemoveTagFromSelectedRows,
+          isAnonymous, selectedRows, setSelectedRows, setStudyParticipantNotActive} = useContext(StudyParticipantContext);
     
     const {
       sortModel, setSortModel,
@@ -40,9 +39,11 @@ export default function ParticipantsTable() {
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
+    const [newTag, setNewTag] = useState('');
+
     const gridStyle = studyParticipants.length === 0
-    ? { height: 400, width: '100%' }
-    : { height: '87vh', width: '100%' };
+    ? { height: '55vh', width: '99%' }
+    : { height: '100%', width: '99%' };
 
     const handleUpdateParticipant = async (updatedParticipant) => {
       const response = await finalUpdateStudyParticipant(updatedParticipant);
@@ -132,6 +133,19 @@ export default function ParticipantsTable() {
       }
   }
 
+  const reorderRowsBasedOnSelection = (rows, selectedRows) => {
+    return [...rows].sort((a, b) => {
+      const aIsSelected = selectedRows.includes(a._id);
+      const bIsSelected = selectedRows.includes(b._id);
+      
+      if (aIsSelected && bIsSelected) return 0; // both rows are selected, keep existing order
+      if (aIsSelected) return -1; // a is selected, b is not, a should come first
+      if (bIsSelected) return 1; // b is selected, a is not, b should come first
+      return 0; // neither is selected, keep existing order
+    });
+  };
+  
+
     let baseColumns = [
       { 
         field: 'serialNum', 
@@ -158,7 +172,12 @@ export default function ParticipantsTable() {
             flex: 1.5,
             headerAlign: 'center',
             align: 'center',
-            valueGetter: (params) => `${params.row.participantInfo.firstName} ${params.row.participantInfo.lastName}`
+            valueGetter: (params) => {
+              const firstName = params.row.participantInfo?.firstName || "";
+              const lastName = params.row.participantInfo?.lastName || "";
+
+              return `${firstName} ${lastName}`.trim();
+            }
           }
       ];
     };
@@ -207,13 +226,13 @@ export default function ParticipantsTable() {
         { 
             field: 'isComplete', 
             headerName: 'Status', 
-            flex: 1.5, 
+            flex: 1, 
             headerAlign: 'center',
             align: 'center',
             valueGetter: (params) => params.row.isComplete ? 'Completed' : 'Processing', 
             renderCell: (params) => params.row.isComplete ? 
-                <Chip label="Completed" color="success"/> : 
-                <Chip label="Processing" color="success" variant="outlined" /> 
+                <Chip label="Completed" color="success" size="small"/> : 
+                <Chip label="Processing" color="success" variant="outlined" size="small" /> 
         },
         { 
             field: 'isGift', 
@@ -231,7 +250,7 @@ export default function ParticipantsTable() {
         { 
             field: 'isWIllReceiveReport', 
             headerName: 'Report\nRequested', 
-            flex: 1.5, 
+            flex: 1.2, 
             headerAlign: 'center',
             align: 'center',
             valueGetter: (params) => params.row.isWIllReceiveReport ? 'Yes' : 'No',
@@ -275,7 +294,7 @@ export default function ParticipantsTable() {
                       flexWrap: 'wrap'
                   }}>
                       {tags.map((tag, index) => (
-                          <Chip key={index} label={tag} size="small" style={{ margin: '0 2px' }} />
+                          <Chip key={index} label={tag} size="small" style={{ marginRight: '2px', marginTop: '2px', marginBottom: '2px' }} />
                       ))}
                   </div>
               );
@@ -322,57 +341,87 @@ export default function ParticipantsTable() {
     ];
 
     return (
-        <div style={gridStyle}>
-            <Box mb={1} display='flex' justifyContent='space-between' height="35px">
-                {selectedRows.length > 0 && 
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'flex-end'}}>
-                      <select value={selectedProperty} onChange={handlePropertyChange}>
-                        <option value="">Select a property</option>
-                        <option value="isComplete">Status</option>
-                        <option value="isGift">Gift</option>
-                        <option value="isWIllReceiveReport">Report Requested</option>
-                        <option value="isWillContact">Future Contact</option>
-                      </select>
-                      <button onClick={handleToggleSelectedRows}>Toggle Selected Rows</button>
-                    </div>
-                    <Button 
-                      variant="outlined"
-                      color='error'
-                      size='small'
-                      onClick={() => setDeleteDialogOpen(true)}>
-                        Delete Selected Participants
-                    </Button>
-                    <OptionDialog 
-                      open={deleteDialogOpen} 
-                      onClose={() => setDeleteDialogOpen(false)}
-                      popupText="This action will delete the selected StudyParticipants. Are you sure you want to proceed?"
-                      onClick={() => {
-                          handleDeleteSelectedRows();
-                          setDeleteDialogOpen(false);
-                      }}
-                    />
-                  </>
-                }
+      <div style={gridStyle} >
+          <Box mb={1} display='flex' justifyContent='space-between' height="35px"  alignItems='center'>
+            {selectedRows.length > 0 && 
+              <>
+                <div style={{ display: 'flex', alignItems: 'flex-end'}}>
+                  <select value={selectedProperty} onChange={handlePropertyChange}>
+                    <option value="">Select a property</option>
+                    <option value="isComplete">Status</option>
+                    <option value="isGift">Gift</option>
+                    <option value="isWIllReceiveReport">Report Requested</option>
+                    <option value="isWillContact">Future Contact</option>
+                  </select>
+                  <button onClick={handleToggleSelectedRows}>Toggle Selected Rows</button>
+                </div>
+                <div style={{display: 'flex', alignItems: 'flex-end'}}>
+                <input 
+                  type="text" 
+                  value={newTag} 
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder="New Tag" 
+                />
+                <button 
+                  onClick={() => handleAddTagToSelectedRows(newTag)}
+                >
+                  Add Tag to Selected Rows
+                </button>
+                <button
+                  onClick={() => handleRemoveTagFromSelectedRows(newTag)}
+                >
+                  Delete Tag from Selected Rows
+                </button>
+                </div>
+                <Button 
+                  variant="outlined"
+                  color='error'
+                  size='small'
+                  onClick={() => setDeleteDialogOpen(true)}>
+                    Delete Selected Participants
+                </Button>
+                <OptionDialog 
+                  open={deleteDialogOpen} 
+                  onClose={() => setDeleteDialogOpen(false)}
+                  popupText="This action will delete the selected StudyParticipants. Are you sure you want to proceed?"
+                  onClick={() => {
+                      handleDeleteSelectedRows();
+                      setDeleteDialogOpen(false);
+                  }}
+                  />
+                </>
+              }
             </Box>
 
             <StyledDataGrid
                 sx={{
-                    '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
-                    '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
-                    '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' },
+                    overflowX: 'hidden',
+                    overflowY: 'hidden',
+                    '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '1px' },
+                    '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '8px' },
+                    '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '15px' },
                 }} 
                 // autoHeight
-                rows={studyParticipants}
+                rows={reorderRowsBasedOnSelection(studyParticipants, selectedRows)}
                 // rows={Array.isArray(studyParticipants) ? studyParticipants : []}
                 columns={columns}
                 // columnVisibilityModel={{
                 //     // Hide column note at the beginning, the other columns will remain visible
                 //     hidden: ['note']
                 // }}
-                getRowHeight={() => 'auto'}
+                //rowHeight='40px'
+                getRowHeight={(params) => {
+                  const tagsCount = params.model.participantInfo.tagsInfo.length;
+                  const baseHeight = 40;
+                  const extraHeightPerThreeTags = 20;
+                  if(tagsCount <= 3) return baseHeight;
+                  return baseHeight + Math.ceil(tagsCount / 3 - 1) * extraHeightPerThreeTags;
+              }}
+                //getRowHeight={() => 'auto'}
+                // getRowHeight={() => 'auto'}
                 getRowId={(row) => row._id}
                 paginationModel={pageModel}
+                density="compact"
                 columnVisibilityModel={columnVisibility}
                 initialState={{
                     columns: {
@@ -398,7 +447,7 @@ export default function ParticipantsTable() {
                     noRowsOverlay: CustomNoRowsOverlay,
                     toolbar: GridToolbar
                 }}
-                pageSizeOptions={[25, 50, 100, 200, 500, 1000, 2000, 5000]}
+                pageSizeOptions={[25, 50, 100]}
                 checkboxSelection={true}
 
                 onSortModelChange={(newModel) => {
@@ -421,5 +470,5 @@ export default function ParticipantsTable() {
                 // hideFooterSelectedRowCount
             />
         </div>
-    );
+    )
 }

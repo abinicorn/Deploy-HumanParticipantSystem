@@ -17,10 +17,15 @@ import GroupIcon from '@mui/icons-material/Group';
 import ScienceIcon from '@mui/icons-material/Science';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
+import { useNavigate } from 'react-router-dom';
+import OptionPopup from '../Popup/OptionPopup';
+
 
 export default function EditStudyTemplate({ isEditMode, studyData, setStudyData, handleSubmit }) {
     const [locationInput, setLocationInput] = useState('');
 
+    const navigate = useNavigate();
+    
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setStudyData({
@@ -45,35 +50,24 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
     };
 
 
+    const handleClose = () => {
+        alert('Study not saved!');
+        navigate('/homepage');
+
+    }
 
     return (
         <div>
-            <Navbar />
             <div style={{ paddingTop: '64px' }}>
-                <Typography variant="h4" component="h1" color="grey" 
-                            style={{
-                                margin: '20px',
-                            }} gutterBottom>
-                    Study Details
-                </Typography>
-
                 <Container>
                     {/* maxWidth="sm" */}
                     <form onSubmit={handleSubmit}>
+                    <Typography variant="h4" component="h1" color="grey" gutterBottom>
+                    Study Details
+                </Typography>
                         <Grid container spacing={2}>
 
-                            <Grid item xs={12}>
-                                <FormLabel>Design a code for your study</FormLabel>
-                                <TextField
-                                    fullWidth
-                                    name="studyCode"
-                                    value={studyData.studyCode}
-                                    onChange={handleInputChange}
-                                    required
-                                    margin="dense"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
+                        <Grid item xs={12}>
                                 <FormLabel>What's the title of the study?</FormLabel>
                                 <TextField
                                     fullWidth
@@ -84,6 +78,19 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                     margin="dense"
                                 />
                             </Grid>
+
+                            <Grid item xs={12}>
+                                <FormLabel>Specify a code for your study</FormLabel>
+                                <TextField
+                                    fullWidth
+                                    name="studyCode"
+                                    value={studyData.studyCode}
+                                    onChange={handleInputChange}
+                                    required
+                                    margin="dense"
+                                />
+                            </Grid>
+
 
 
                             <Grid item xs={4}>
@@ -214,9 +221,10 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                 </Grid>
                                 <Grid item xs={4}>
                                     <div style={{ margin: '50px' }}>
-                                        <Button type="button" variant="contained" color="secondary" onClick={() => alert('Changes discarded.')}>
-                                            CANCEL
-                                        </Button>
+                                    <OptionPopup 
+                                        buttonText={'Cancel'} 
+                                        popupText={'Are you sure you want to discard the saving?'} 
+                                        onClick={handleClose}/>
                                     </div>
                                 </Grid>
                             </Grid>

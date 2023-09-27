@@ -8,11 +8,6 @@ export default function CreateStudyPage() {
 
     const navigate = useNavigate("/");
     const {user}= useCurrentUser();
-    console.log ("user", user);
-
-
-
-    // const researcherId = '64fe98fdae1ff28bdcd455a7';
 
     const researcherId = user.userId;
 

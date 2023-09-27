@@ -9,7 +9,7 @@ export default function EditStudyPage() {
     const { studyId } = useParams();
     // const researcherId = '64fe98fdae1ff28bdcd455a7';
 
-    const { data, isLoading, refresh } = useGet(`https://human-participant.onrender.com/study/${studyId}`, []);
+    const { data, isLoading, refresh } = useGet(`/study/${studyId}`, []);
     const [studyData, setStudyData] = useState({
         studyCode: '',
         studyName: '',

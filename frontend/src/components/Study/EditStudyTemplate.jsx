@@ -17,9 +17,6 @@ import GroupIcon from '@mui/icons-material/Group';
 import ScienceIcon from '@mui/icons-material/Science';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
-import axios from 'axios';
-
-const apiClient = axios.create();
 
 export default function EditStudyTemplate({ isEditMode, studyData, setStudyData, handleSubmit }) {
     const [locationInput, setLocationInput] = useState('');

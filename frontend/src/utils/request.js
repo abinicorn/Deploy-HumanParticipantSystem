@@ -46,7 +46,7 @@ request.interceptors.response.use(
         }
 
 
-        if (error.response.status === 402) {
+        if (error.response && error.response.status === 402) {
             alert("Token has expired, please log in again.");
             window.location.href = "/";
         }

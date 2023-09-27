@@ -9,6 +9,8 @@ export default function CreateStudyPage() {
     const navigate = useNavigate("/");
     const {user}= useCurrentUser();
 
+    const url = process.env.NODE_ENV === "development" ? process.env.REACT_APP_URL_DEVELOPMENT : process.env.REACT_APP_URL_PRODUCTION;
+
     const researcherId = user.userId;
 
     const [studyData, setStudyData] = useState({
@@ -45,7 +47,7 @@ export default function CreateStudyPage() {
     const createStudy = async (studyData) => {
 
         try {
-            const response = await request.post(`/study/${researcherId}`, studyData);
+            const response = await request.post(`${url}/study/${researcherId}`, studyData);
             return response.data;
         } catch (error) {
             console.error('Error creating study:', error);

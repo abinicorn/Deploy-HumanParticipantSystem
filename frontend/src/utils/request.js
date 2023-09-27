@@ -2,7 +2,7 @@ import axios from "axios";
 import {tokenService, TokenType} from "../services/tokenService";
 
 export const request = axios.create({
-    timeout: 15000,
+    timeout: 150000,
     headers: {
         "Content-Type": "application/json",
     },

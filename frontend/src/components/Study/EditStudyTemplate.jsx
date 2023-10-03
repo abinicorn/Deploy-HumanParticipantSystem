@@ -127,7 +127,7 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                             </Grid>
 
                             <Grid item xs={6}>
-                                <FormLabel>Recruitment Start Date</FormLabel>
+                                <FormLabel>Project Start Date</FormLabel>
                                 <TextField
                                     fullWidth
                                     type="date"
@@ -138,7 +138,7 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                 />
                             </Grid>
                             <Grid item xs={6}>
-                                <FormLabel>Recruitment Close Date</FormLabel>
+                                <FormLabel>Project Close Date</FormLabel>
                                 <TextField
                                     fullWidth
                                     type="date"

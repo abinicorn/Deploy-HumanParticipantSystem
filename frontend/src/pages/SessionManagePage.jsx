@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import CreateEditSession from '../components/Session/CreateEditSession';
 import SessionActionButton from '../components/Button/SessionActionButton';
 import { SessionContext } from '../providers/SessionContextProvider';
@@ -13,7 +13,7 @@ import { StudyResearcherContext } from '../providers/StudyResearcherContextProvi
 export default function SessionManagePage() {
   
   const { studyInfo } = React.useContext(StudyResearcherContext)
-  const { sessions } = React.useContext(SessionContext);
+  const { sessions, sessionLoading } = React.useContext(SessionContext);
   const activeSessions = sessions.filter(function(item) {return item.isArchive === false});
 
   const columns = [
@@ -58,6 +58,7 @@ export default function SessionManagePage() {
                 noRowsOverlay: CustomNoRowsOverlaySession,
                 toolbar: GridToolbar
               }}
+              loading={sessionLoading}
               disableSelectionOnClick
               hideFooterSelectedRowCount
             />

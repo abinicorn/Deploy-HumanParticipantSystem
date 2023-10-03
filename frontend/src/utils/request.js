@@ -1,8 +1,11 @@
 import axios from "axios";
 import {tokenService, TokenType} from "../services/tokenService";
 
+const baseUrl = process.env.REACT_APP_API_BASE_URL
+
 export const request = axios.create({
-    timeout: 150000,
+    baseURL: baseUrl,
+    timeout: 15000,
     headers: {
         "Content-Type": "application/json",
     },

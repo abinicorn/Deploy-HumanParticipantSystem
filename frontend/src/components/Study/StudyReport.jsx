@@ -13,7 +13,7 @@ import {StyledDataGrid} from "../../styles/StyledDataGrid";
 
 export default function StudyReport({data}){
 
-    const [study, setStudyData] = useState(data);
+    const [studyData, setStudyData] = useState(data);
 
 
 
@@ -26,18 +26,16 @@ export default function StudyReport({data}){
             try {
 
 
-                const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/session/list/${study.studyId}`);
+                const response = await request.get(`/session/list/${studyData.studyId}`);
 
                 setSessionList(response.data);
-
-
 
             } catch (error) {
                 console.error('Error fetching session data:', error);
             }
         };
         fetchData();
-    }, [study]);
+    }, [studyData]);
 
     const sessionRows = (sessionList || []).map((sessionInfo, index) => ({
         id: index + 1,
@@ -71,12 +69,12 @@ export default function StudyReport({data}){
 
         fetchData();
 
-    }, [study]);
+    }, [studyData]);
 
 
 
     async function fetchStudyParticipants() {
-        const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${study.studyId}`);
+        const response = await request.get(`/study-participants/${studyData.studyId}`);
         setStudyParticipants(response.data);
     };
 
@@ -103,16 +101,16 @@ export default function StudyReport({data}){
     const exportData = () => {
 
         const studyInfo = {
-            studyName: study.name,
-            studyCode: study.studyCode,
-            creator: study.creator,
-            researcherList: study.researcherList.map((researcher, index) => (
+            studyName: studyData.name,
+            studyCode: studyData.studyCode,
+            creator: studyData.creator,
+            researcherList: studyData.researcherList.map((researcher, index) => (
                 `${researcher.firstName} ${researcher.lastName}`
             )).join(', '),
-            description: study.description,
-            experimentType: study.studyType,
-            date: parseData(study.createdAt),
-            location: study.location.join('; ')
+            description: studyData.description,
+            experimentType: studyData.studyType,
+            date: parseData(studyData.createdAt),
+            location: studyData.location.join('; ')
         }
 
         const sessionInfo = (sessionList || []).map((sessionInfo, index) => ({
@@ -155,135 +153,211 @@ export default function StudyReport({data}){
         <div>
 
 
-                        <Grid container spacing={2} alignItems="center" justifyContent="flex-start">
-                            <Grid item xs={12} align="right">
-                                <Button variant="contained" onClick={exportData}>Export JSON</Button>
-                            </Grid>
-                            <Grid item xs={12} align="center">
-                                <Typography variant="h3">{study.name} ({study.studyCode})</Typography>
-                            </Grid>
-                            <Grid item xs={12} align="center">
-                                <Typography variant="h4">By {study.creator}</Typography>
-                            </Grid>
-                            <Grid item xs={12} align="left">
-                                <Typography variant="h5">Researcher List: &nbsp;
-                                    {study.researcherList.map((researcher, index) => (
-                                        <span key={index}>{researcher.firstName + ' ' + researcher.lastName}；</span>
-                                    ))}
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} align="left">
-                                <Typography variant="h5">Description:</Typography>
-                                <Paper elevation={0} sx={{ padding: '10px' }}>
-                                    <Box sx={{ padding: '10px', borderRadius: '4px' }}>
-                                        <Typography variant="body1">{study.description}</Typography>
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} align="h5">
-                                <Typography variant="h5" style={{ marginBottom: '10px', display: 'flex'}}>
+            <Grid container spacing={2} alignItems="center" justifyContent="flex-start">
+                <Grid item xs={12} align="right">
+                    <Button variant="contained" onClick={exportData}>Export JSON</Button>
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <Typography variant="h3" style={{ color: '#19467B' }}>{studyData.name} ({studyData.studyCode})</Typography>
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <Typography variant="h5" >By {studyData.creator}</Typography>
+                </Grid>
+
+                <Grid item xs={12} align="left">
+                    <Typography variant="h5">
+                        <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Researcher List:</span>
+                    </Typography>
+                </Grid>
+
+                <Grid item xs={12} align="left">
+                    <Typography variant="h5">
+                        &nbsp;&nbsp; &nbsp;
+                        {studyData.researcherList.map((researcher, index) => (
+                            <span key={index} style={{ display: 'inline-block', textDecoration: 'underline'}}>
+                                    {researcher.firstName + ' ' + researcher.lastName}
+                                {index < studyData.researcherList.length - 1 && '；'}
+                                </span>
+                        ))}
+                    </Typography>
+                </Grid>
+
+                <Grid item xs={12} align="left">
+                    <Typography variant="h5" style={{ fontWeight: 'bold', color: '#19467B' }}>Description:</Typography>
+                    <Box sx={{ padding: '10px', borderRadius: '4px' }}>
+                        <Typography variant="h6">{studyData.description}</Typography>
+                    </Box>
+                </Grid>
+
+                <Grid item xs={12} align="h5">
+                    <Typography variant="h5" style={{ marginBottom: '10px', display: 'flex'}}>
                             <span>
-                                Experiment Type: &nbsp;{study.studyType}
-                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                Date: &nbsp;{parseData(study.createdAt)}
+                                <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Experiment Type:</span>
+                                &nbsp; &nbsp; &nbsp;
+
+                                <span style={{ textDecoration: 'underline' }}>
+                                  {studyData.studyType}
+                                </span>
                             </span>
-                                </Typography>
-                            </Grid>
+                    </Typography>
+                </Grid>
 
-                            <Grid item xs={12} align="left">
-                                <Typography variant="h5" style={{ marginBottom: '10px' }}>Location: &nbsp;{study.location.join('; ')}</Typography>
-                            </Grid>
+                <Grid item xs={12} align="h5">
+                    <Typography variant="h5" style={{ marginBottom: '10px', display: 'flex'}}>
+                            <span>
+                                <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Start Date:</span>
+                                &nbsp; &nbsp; &nbsp;
 
-                            <Grid item xs={12} align="left">
-                                <Typography variant="h5" style={{ marginBottom: '10px' }}>Survey Link: &nbsp;{study.surveyLink}</Typography>
-                            </Grid>
-                            <Grid item xs={12} align="left">
-                                <Typography variant="h5" style={{ marginBottom: '10px' }}>Drive Link: &nbsp;{study.driveLink}</Typography>
-                            </Grid>
-                            <Grid item xs={12} align="left">
-                                <Typography variant="h5" style={{ marginBottom: '10px' }}>Status: &nbsp;{study.status ? 'Active' : 'Close'}</Typography>
-                            </Grid>
+                                <span style={{ textDecoration: 'underline' }}>
+                                  {parseData(studyData.recruitmentStartDate)}
+                                </span>
 
+                            </span>
+                    </Typography>
+                </Grid>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '50px', width: '100%' }}>
-                                <Paper sx={{ flex: 1, width: '100%' }}>
-                                    <Grid container alignItems="center" justifyContent="center">
-                                        <Typography variant="h5" style={{ marginTop: '10px' }}>Session List</Typography>
-                                    </Grid>
+                <Grid item xs={12} align="h5">
+                    <Typography variant="h5" style={{ marginBottom: '10px', display: 'flex'}}>
+                            <span>
+                                <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Close Date:</span>
+                                &nbsp; &nbsp; &nbsp;
+                                <span style={{ textDecoration: 'underline' }}>
+                                  {parseData(studyData.recruitmentCloseDate)}
+                                </span>
 
-                                    <StyledDataGrid
-                                        sx={{
-                                            height: "65vh",
-                                            maxWidth: '100vw',
-                                            overflowY: 'auto',
-                                            overflowX: 'hidden',
-                                            marginTop: 2,
-                                            '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
-                                            '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
-                                            '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
-                                        }}
-                                        rows={sessionRows}
-                                        columns={sessionColumns}
-                                        initialState={{
-                                            pagination: {
-                                                paginationModel: { page: 0, pageSize: 10 },
-                                            },
-                                        }}
-                                        pageSizeOptions={[10, 25, 50]}
-                                        slots={{
-                                            noRowsOverlay: CustomNoRowsOverlaySession,
-                                            toolbar: GridToolbar
-                                        }}
-                                        disableSelectionOnClick
-                                        hideFooterSelectedRowCount
-                                        checkboxSelection
-                                    />
+                            </span>
+                    </Typography>
+                </Grid>
 
-                                </Paper>
-                            </div>
+                <Grid item xs={12} align="h5">
+                    <Typography variant="h5" style={{ marginBottom: '10px' }}>
+                        <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Location:</span>
+                    </Typography>
+                </Grid>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                                <Paper sx={{ flex: 1, width: '100%' }}>
-                                    <Grid container alignItems="center" justifyContent="center">
-                                        <Typography variant="h5" style={{ marginTop: '10px' }}>
-                                            Participant List
-                                        </Typography>
-                                    </Grid>
+                <Grid item xs={12} align="h5">
+                    <Typography variant="h5" style={{ marginBottom: '10px' }}>
+                        &nbsp; &nbsp; &nbsp;
+                        <span style={{ textDecoration: 'underline' }}>
+                              {studyData.location.join("; \u00A0")}
+                            </span>
 
-                                    <StyledDataGrid
-                                        sx={{
-                                            height: "65vh",
-                                            maxWidth: '100vw',
-                                            overflowY: 'auto',
-                                            overflowX: 'hidden',
-                                            marginTop: 2,
-                                            '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
-                                            '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
-                                            '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
-                                        }}
-                                        rows={participantsRows}
-                                        columns={participantsColumns}
-                                        initialState={{
-                                            pagination: {
-                                                paginationModel: { page: 0, pageSize: 10 },
-                                            },
-                                        }}
-                                        pageSizeOptions={[10, 25, 50]}
-                                        slots={{
-                                            noRowsOverlay: CustomNoRowsOverlaySession,
-                                            toolbar: GridToolbar
-                                        }}
-                                        disableSelectionOnClick
-                                        hideFooterSelectedRowCount
-                                        checkboxSelection
-                                    />
-
-                                </Paper>
-                            </div>
+                    </Typography>
+                </Grid>
 
 
+                <Grid item xs={12} align="left">
+                    <Typography variant="h5" style={{ marginBottom: '10px' }}>
+                        <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Survey Link:</span>
+                        &nbsp; &nbsp; &nbsp;
 
+                        <span style={{ textDecoration: 'underline', color: '#4299C3' }}>
+                                  {studyData.surveyLink}
+                                </span>
+                    </Typography>
+                </Grid>
+
+                <Grid item xs={12} align="left">
+                    <Typography variant="h5" style={{ marginBottom: '10px' }}>
+                        <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Drive Link:</span>
+                        &nbsp; &nbsp; &nbsp;
+                        <span style={{ textDecoration: 'underline', color: '#4299C3' }}>
+                                  {studyData.driveLink}
+                                </span>
+                    </Typography>
+                </Grid>
+
+                <Grid item xs={12} align="left">
+                    <Typography variant="h5" style={{ marginBottom: '10px' }}>
+                        <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Status:</span>
+                        &nbsp; &nbsp; &nbsp;
+
+                        <span style={{ textDecoration: 'underline' }}>
+                                {studyData.isClosed ? 'Close' : 'Active'}
+                                </span>
+                    </Typography>
+                </Grid>
+
+
+                <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '50px', width: '100%' }}>
+                    <Paper sx={{ flex: 1, width: '100%' }}>
+                        <Grid container alignItems="center" justifyContent="center">
+                            <Typography variant="h5" style={{ marginTop: '10px', fontWeight: 'bold', display: 'inline-block', color: '#19467B'}}>Session List</Typography>
                         </Grid>
+
+                        <StyledDataGrid
+                            sx={{
+                                height: "65vh",
+                                maxWidth: '100vw',
+                                overflowY: 'auto',
+                                overflowX: 'hidden',
+                                marginTop: 2,
+                                '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                                '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                                '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
+                            }}
+                            rows={sessionRows}
+                            columns={sessionColumns}
+                            initialState={{
+                                pagination: {
+                                    paginationModel: { page: 0, pageSize: 10 },
+                                },
+                            }}
+                            pageSizeOptions={[10, 25, 50]}
+                            slots={{
+                                noRowsOverlay: CustomNoRowsOverlaySession,
+                                toolbar: GridToolbar
+                            }}
+                            disableSelectionOnClick
+                            hideFooterSelectedRowCount
+                            checkboxSelection
+                        />
+
+                    </Paper>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                    <Paper sx={{ flex: 1, width: '100%' }}>
+                        <Grid container alignItems="center" justifyContent="center">
+                            <Typography variant="h5" style={{ marginTop: '10px', fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>
+                                Participant List
+                            </Typography>
+                        </Grid>
+
+                        <StyledDataGrid
+                            sx={{
+                                height: "65vh",
+                                maxWidth: '100vw',
+                                overflowY: 'auto',
+                                overflowX: 'hidden',
+                                marginTop: 2,
+                                '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                                '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                                '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
+                            }}
+                            rows={participantsRows}
+                            columns={participantsColumns}
+                            initialState={{
+                                pagination: {
+                                    paginationModel: { page: 0, pageSize: 10 },
+                                },
+                            }}
+                            pageSizeOptions={[10, 25, 50]}
+                            slots={{
+                                noRowsOverlay: CustomNoRowsOverlaySession,
+                                toolbar: GridToolbar
+                            }}
+                            disableSelectionOnClick
+                            hideFooterSelectedRowCount
+                            checkboxSelection
+                        />
+
+                    </Paper>
+                </div>
+
+
+
+            </Grid>
 
 
         </div>

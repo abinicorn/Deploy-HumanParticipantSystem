@@ -28,7 +28,7 @@ export default function StudyReportPopup({currentStudy, studyId}) {
 
         const fetchData = async () => {
             try {
-                const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/session/list/${studyId}`);
+                const response = await request.get(`/session/list/${studyId}`);
 
                 setSessionList(response.data);
 
@@ -83,7 +83,7 @@ export default function StudyReportPopup({currentStudy, studyId}) {
 
 
     async function fetchStudyParticipants() {
-        const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${studyId}`);
+        const response = await request.get(`/study-participants/${studyId}`);
         setStudyParticipants(response.data);
     };
 

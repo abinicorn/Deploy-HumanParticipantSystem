@@ -52,7 +52,7 @@ export default function ResearcherProfilePage() {
 
 
     const updateInfo = async () => {
-        const url = 'https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/update/info';
+        const url = '/researcher/update/info';
 
         const req = {
             firstName: currentUserInfo.currentFirstName,
@@ -125,7 +125,7 @@ export default function ResearcherProfilePage() {
     };
 
     const resetPassword = (currentPwd, newPwd) => {
-        const url = 'https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/resetPwd';
+        const url = '/researcher/resetPwd';
 
         const req = {
             currentPwd: currentPwd,

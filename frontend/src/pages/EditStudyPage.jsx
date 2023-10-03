@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useGet from '../hooks/useGet';
 import EditStudyTemplate from '../components/Study/EditStudyTemplate';
 import {request} from "../utils/request";
@@ -8,8 +8,10 @@ import {request} from "../utils/request";
 export default function EditStudyPage() {
     const { studyId } = useParams();
     // const researcherId = '64fe98fdae1ff28bdcd455a7';
+    const navigate = useNavigate("/");
 
-    const { data, isLoading, refresh } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/${studyId}`, []);
+
+    const { data, isLoading, refresh } = useGet(`/study/${studyId}`, []);
     const [studyData, setStudyData] = useState({
         studyCode: '',
         studyName: '',
@@ -48,13 +50,14 @@ export default function EditStudyPage() {
             .then((res) => {
                 alert("Successfully edited study");
                 refresh();
+                // navigate(`/studyInfo/${studyId}`);
             })
         
     };
 
     const editStudy = async (studyData) => {
         try {
-            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/${studyId}`, studyData);
+            const response = await request.put(`/study/${studyId}`, studyData);
             return response.data;
         } catch (error) {
             alert(`Error editing study`);

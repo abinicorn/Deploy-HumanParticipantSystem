@@ -5,17 +5,19 @@ import SessionMailingList from './SessionMailingList';
 import { SessionContext } from '../../providers/SessionContextProvider';
 import { combineCodeSerialNum } from '../../utils/combineCodeSerialNum';
 import { StudyResearcherContext } from '../../providers/StudyResearcherContextProvider';
+import { StudyParticipantContext } from '../../providers/StudyPaticipantsProvider';
 
 export default function SessionParticipantList({ targetSessionId }) {
     
     const [open, setOpen] = React.useState(false);
     const scroll ='paper';
     const { studyInfo } = React.useContext(StudyResearcherContext);
-    const { sessions, studyParticipantInfo } = React.useContext(SessionContext);
+    const { studyParticipants } = React.useContext(StudyParticipantContext);
+    const { sessions } = React.useContext(SessionContext);
     const targetSession = sessions.find(s => s._id === targetSessionId);
     let participantInfo = []
-    if (studyParticipantInfo) {
-        participantInfo = studyParticipantInfo.reduce(
+    if (studyParticipants) {
+        participantInfo = studyParticipants.reduce(
             (result, item) =>
             targetSession.participantList.some(el => el._id === item.participantInfo._id)
                 ? [...result, item]

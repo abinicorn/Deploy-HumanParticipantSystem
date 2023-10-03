@@ -15,7 +15,6 @@ import { checkPhoneNumValidation } from '../../utils/checkPhoneNumValidation'
 export default function EditParticipant({participant, onSave, isAnonymous}) {
     const [localParticipant, setLocalParticipant] = useState(participant);
     const [editOpen, setEditOpen] = useState(false); 
-    const [popUpOpen, setPopUpOpen] = useState(false);
     const [emailError, setEmailError] = useState('');
     const [phoneNumError, setPhoneNumError] = useState('');
 
@@ -52,7 +51,7 @@ export default function EditParticipant({participant, onSave, isAnonymous}) {
         }));
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!checkEmailValidation(localParticipant.participantInfo.email)) {
             setEmailError('Invalid email format');
             return false;
@@ -61,9 +60,9 @@ export default function EditParticipant({participant, onSave, isAnonymous}) {
             setPhoneNumError('Invalid phone number format');
             return false;
         }
-        onSave(localParticipant);
-        console.log('Saved!');
-        return true;
+        const response = await onSave(localParticipant);
+        return response;
+        
     };
 
     const handleClose = () => {
@@ -250,7 +249,7 @@ export default function EditParticipant({participant, onSave, isAnonymous}) {
                     />
                 </DialogContent>
                 <DialogActions style={{ padding: '20px'}}>
-                    <ConfirmPopup buttonText={'Save'} popupText={'Your edit has been saved!'} open={popUpOpen} onClick={handleSave} onConfirm={handleClose}/>
+                    <ConfirmPopup buttonText={'Save'} popupText={'Your edit has been saved!'} onClick={handleSave} onConfirm={handleClose}/>
                     <OptionPopup buttonText={'Cancel'} popupText={'Do you want to cancel?'} onClick={handleClose}/>
                 </DialogActions>
             </Dialog>

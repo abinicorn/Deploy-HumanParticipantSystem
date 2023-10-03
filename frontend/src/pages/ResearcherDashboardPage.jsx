@@ -6,7 +6,6 @@ import {useEffect, useState} from "react";
 import '../styles/App.css';
 import StudyDetailPopup from "../components/Study/StudyDetailPopup"
 import {useCurrentUser} from "../hooks/useCurrentUser";
-import HomeActionButton from '../components/Button/HomeActionButton';
 import { useNavigate } from 'react-router-dom';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
@@ -19,13 +18,11 @@ import {StyledDataGrid} from "../styles/StyledDataGrid";
 
 
 
-
-
 export default function ResearcherDashboardPage() {
 
     const {user} = useCurrentUser();
     const navigate= useNavigate();
-
+    const [loading, setLoading] = React.useState(false)
 
     useEffect(() => {
 
@@ -34,11 +31,15 @@ export default function ResearcherDashboardPage() {
         const fetchData = async () => {
 
                     try {
-                        const studyInfoList = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/studyList/${user.userId}`);
+                        setLoading(true)
+                        const studyInfoList = await request.get(`/researcher/studyList/${user.userId}`);
 
                         setStudyList(studyInfoList.data);
+                    
                     } catch (error) {
                         console.error('Error fetching study data:', error);
+                    } finally {
+                        setLoading(false)
                     }
 
         };
@@ -108,19 +109,10 @@ export default function ResearcherDashboardPage() {
             flex: 1,
             headerClassName: 'App-Font',
             renderCell: (params) => (
-                // <a href="#/" onClick={() => handleNameClick(params.row)}> {params.row.name} </a>
-                //  <a href={`/studyInfo/${params.row.studyId}`}>{params.row.name}</a>
 
-                // <Link to={{
-                //     pathname: `/studyInfo/${params.row.studyId}`,
-                //
-                //     state: '111'
-                // }}>{params.row.name}</Link>
                 <div
                     onClick={() => {
-                        navigate(`/studyInfo/${params.row.studyId}`, {
-                            state: { study: params.row },
-                        });
+                        navigate(`/studyInfo/${params.row.studyId}`);
                     }}
                     style={{ textDecoration: 'underline', cursor: 'pointer' }}
                 >
@@ -167,21 +159,7 @@ export default function ResearcherDashboardPage() {
                 </div>
             ),
             width: 120,
-        },
-        // {
-        //     field: 'studyId',
-        //     headerName: 'Action',
-        //     flex: 1,
-        //     headerClassName: 'App-Font',
-        //     renderCell: (params) =>
-        //             <HomeActionButton
-        //                 pageItemId={params.row.studyId}
-        //                 currentStudy={params.row}
-        //                 setStudyList={setStudyList}
-        //                 studyList={studyList}
-        //             />
-        //
-        // },
+        }
     ];
 
 
@@ -190,21 +168,6 @@ export default function ResearcherDashboardPage() {
         navigate('/studyDetail/create');
 
     }
-
-    // Component where you want to navigate from
-
-
-        // const handleButtonClick = () => {
-        //     // Assuming you want to send an object as a prop
-        //     const objToSend = { name: 'John Doe', age: 25 };
-        //
-        //     // Navigate to PageTwo and send the object as a prop
-        //
-        //     navigate(url, {
-        //         state: { objToSend } }
-        //     })
-        //
-        // };
 
 
 
@@ -215,63 +178,58 @@ export default function ResearcherDashboardPage() {
         <div>    
             <Navbar/> 
             <CssBaseline />
-            <div style={{marginLeft:'5%', marginRight: '5%'}}>
-                <Grid container spacing={-20}
-                        alignItems="center"
-                        marginTop='5%'
-                        marginBottom = '0.5%'
-                        justifyContent="flex-end"
-                >
-                    <Button sx={{
-                        marginRight: '-7%',
-                        fontSize: '16px',
-                    }} disableElevation
-                            variant="contained"
-                            aria-label="Disabled elevation buttons"
-                            onClick={handleCreateStudy}
+        <div style={{marginLeft:'5%', marginRight: '5%', marginTop: '6.5%'}}>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '7%'}}>
+                <Button sx={{
+                    marginRight: '-7%',
+                    fontSize: '16px',
+                }} disableElevation
+                        variant="contained"
+                        aria-label="Disabled elevation buttons"
+                        onClick={handleCreateStudy}
 
-                    >Create Study</Button>
-                </Grid>
+                >Create Study</Button>
+            </Box>
 
-                <div style={{ height: '100vh' }}>
-                <StyledDataGrid
-                    sx={{
-                        height: "80vh",
-                        maxWidth: '100vw',
-                        overflowY: 'auto',
-                        overflowX: 'hidden',
-                        marginTop: 2,
-                        '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
-                        '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
-                        '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
-                    }}
-                    rows={rows}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: { page: 0, pageSize: 10 },
-                        },
-                    }}
-                    pageSizeOptions={[10, 25, 50]}
-                    slots={{
-                        noRowsOverlay: CustomNoRowsOverlayDashboard,
-                        toolbar: GridToolbar
-                    }}
-                    disableSelectionOnClick
-                    hideFooterSelectedRowCount
-                />
-                </div>
-
-
-
-                {isStudyDetailPopupOpen && (
-                    <StudyDetailPopup study={selectedStudy} onClose={handleStudyDetailClosePopup} open={isStudyDetailPopupOpen}/>
-                )}
-
-
-
+            <div style={{ height: '100vh'}}>
+            <StyledDataGrid
+                sx={{
+                    height: "80vh",
+                    maxWidth: '100vw',
+                    overflowY: 'hidden',
+                    overflowX: 'hidden',
+                    marginTop: 2,
+                    '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                    '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                    '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
+                }}
+                rows={rows}
+                columns={columns}
+                initialState={{
+                    pagination: {
+                        paginationModel: { page: 0, pageSize: 10 },
+                    },
+                }}
+                pageSizeOptions={[10, 25, 50]}
+                slots={{
+                    noRowsOverlay: CustomNoRowsOverlayDashboard,
+                    toolbar: GridToolbar
+                }}
+                loading={loading}
+                disableSelectionOnClick
+                hideFooterSelectedRowCount
+            />
             </div>
-        </div>
 
+
+
+            {isStudyDetailPopupOpen && (
+                <StudyDetailPopup study={selectedStudy} onClose={handleStudyDetailClosePopup} open={isStudyDetailPopupOpen}/>
+            )}
+
+
+
+        </div>
+        </div>
     );
 }

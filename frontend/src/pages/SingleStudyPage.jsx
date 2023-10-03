@@ -14,21 +14,18 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DescriptionIcon from '@mui/icons-material/Description';
 import TopicIcon from '@mui/icons-material/Topic';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import { useParams } from 'react-router-dom';
-import { StudyResearcherContextProvider } from '../providers/StudyResearcherContextProvider';
 import ResearcherManagePopup from '../components/Researcher/ResearcherManagePopup'; 
-import SessionContextProvider from '../providers/SessionContextProvider';
 import SessionManagePage from './SessionManagePage';
 import EditStudyPage from './EditStudyPage';
-import StudyParticipantProvider from '../providers/StudyPaticipantsProvider';
 import ParticipantManagePage from './ParticipantManagePage';
+import {StudyResearcherContext} from '../providers/StudyResearcherContextProvider';
 import HomeIcon from '../assets/The University of Auckland.png';
 import { useNavigate } from 'react-router-dom';
 import { authService } from "../services/authService";
 import StudyDetail from "../components/Study/StudyDetail";
-import { useLocation } from 'react-router-dom';
-import StudyReport from "../components/Study/StudyReport";
 import { DataGridProvider } from '../providers/DataGridProvider';
+import {useEffect} from "react";
+import { useCurrentUser } from '../hooks/useCurrentUser';
 
 const drawerWidth = 240;
 
@@ -101,30 +98,44 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function SingleStudyPage() {
 
-    const location = useLocation();
-    const { state } = location;
-    const [studyData, setStudyData] = React.useState(state.study);
 
-    const { studyId } = useParams();
+    const {
+        studyDetailInfo,
+        refreshStudyDetailContext
+    } = React.useContext(StudyResearcherContext);
+
+    console.log(studyDetailInfo.isClosed);
+    const [isClosed, setIsClosed] = React.useState(true);
+
+    useEffect(()=>{
+        setIsClosed(studyDetailInfo.isClosed);
+    },[studyDetailInfo])
+
+    const updateStudyStatus = () => {
+        setIsClosed(true);
+    }
+
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
-    const [component, setComponent] = React.useState('general');
+    const [openResearcher, setOpenResearcher] = React.useState(false);
 
     const navigate = useNavigate();
     const settings = ['Profile', 'Logout'];
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+    const {user}= useCurrentUser();
+    const {studyInfo}=React.useContext(StudyResearcherContext);
 
     function createData(icon, title) {
         return { icon, title };
     }
 
     const actionList = [
-        createData(<TopicIcon/>, 'Study Detail'),
+        createData(<DescriptionIcon/>, 'Study Detail'),
         createData(<EditIcon/>, 'Edit Study Detail'),
         createData(<PeopleOutlineIcon/>, 'Manage Researchers'),
         createData(<PeopleIcon/>, 'Manage Participants'),
         createData(<CalendarMonthIcon/>, 'Manage Sessions'),
-        createData(<DescriptionIcon/>, 'Generate Report'),
         createData(<HomeOutlinedIcon/>, 'Back to Dashboard')
       ];
   
@@ -146,13 +157,50 @@ export default function SingleStudyPage() {
 
     const handleSettingClick = async (setting) => {
       if (setting === 'Profile') {
-          navigate('/researcher/profile')
+        setComponent('general');
+        navigate('/researcher/profile')
       } else if (setting === 'Logout') {
-          await authService.signOut();
+        setComponent('general');  
+        await authService.signOut();
           navigate('/')
       }
       handleCloseUserMenu();
     };
+
+    const handleOpenResearcher = () => {
+      setComponent('general')
+      setOpenResearcher(true);
+    };
+
+    const handleCloseResearcher = () => {
+      setOpenResearcher(false);
+      // navigate(`/studyInfo/${studyId}`);
+    }
+
+  // Function to get the current component state from local storage
+    const getCurrentComponentFromLocalStorage = () => {
+      const storedComponent = localStorage.getItem('currentComponent');
+      return storedComponent || 'general'; // Default to 'general' if not found
+    };
+
+  // Function to save the current component state to local storage
+    const saveCurrentComponentToLocalStorage = (componentName) => {
+      localStorage.setItem('currentComponent', componentName);
+    };
+
+  // Initialize the component state from local storage or default to 'general'
+    const [component, setComponent] = React.useState(getCurrentComponentFromLocalStorage()); 
+  
+  // When the component state changes, save it to local storage
+    React.useEffect(() => {
+      saveCurrentComponentToLocalStorage(component);
+    }, [component]);
+
+    const handleBackToHome = () => {
+      saveCurrentComponentToLocalStorage('general');
+      navigate('/homepage');
+      
+    }
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -172,7 +220,7 @@ export default function SingleStudyPage() {
               <MenuIcon />
             </IconButton>
               <img src={HomeIcon} alt="" width={100}/>
-              <Typography variant="h6" noWrap component="a" href="/homepage" 
+              <Typography variant="h6" noWrap component="a" href="/homepage" onClick={() => setComponent('general')}
                 sx={{
                       mr: 2,
                       display: { xs: 'none', md: 'flex' },
@@ -181,7 +229,8 @@ export default function SingleStudyPage() {
                       color: 'inherit',
                       textDecoration: 'none',
                       flexGrow: 3
-                    }}>ResearchFusion</Typography>
+                    }}
+                    >ResearchFusion</Typography>
             <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -221,102 +270,84 @@ export default function SingleStudyPage() {
           </DrawerHeader>
           <Divider />
           <List>
-              <ListItem key={0} disablePadding sx={{ display: 'block' }} onClick={() => setComponent('general')}>
+              <ListItem key={0} disablePadding sx={{ display: 'block', ...(component === 'general' && {backgroundColor: '#e0e0e0'})}} onClick={() => setComponent('general')}>
                 <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
                   <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[0].icon}</ListItemIcon>
                   <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[0].title}</ListItemText>
                 </ListItemButton>
               </ListItem>
-              {studyData.status ? (
-                      <ListItem key={1} disablePadding sx={{ display: 'block' }} onClick={() => setComponent('detail')}>
-                <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
-
-
-                        <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
-                            {actionList[1].icon}
-                        </ListItemIcon>
-
-                  <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[1].title}</ListItemText>
-                </ListItemButton>
+              {!isClosed ? (
+                <ListItem key={1} disablePadding sx={{ display: 'block', ...(component === 'detail' && {backgroundColor: '#e0e0e0'})}} onClick={() => setComponent('detail')}>
+                  <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
+                    <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
+                        {actionList[1].icon}
+                    </ListItemIcon>
+                    <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[1].title}</ListItemText>
+                  </ListItemButton>
               </ListItem>
               ) : null}
 
-              {studyData.status ? (
-              <ListItem key={2} disablePadding sx={{ display: 'block' }} onClick={() => setComponent('general')}>
+              {!isClosed && studyInfo.creator === user.userId ? (
+              <ListItem key={2} disablePadding sx={{ display: 'block' }} onClick={handleOpenResearcher}>
                 <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
                   <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[2].icon}</ListItemIcon>
-                  <ListItemText sx={{ opacity: open ? 1 : 0 }}>
-                    <StudyResearcherContextProvider pageItemId={studyId}><ResearcherManagePopup/></StudyResearcherContextProvider> 
-                  </ListItemText>
+                  <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[2].title}</ListItemText>
                 </ListItemButton>
               </ListItem>
               ) : null}
 
-
-                  {studyData.status ? (
-              <ListItem key={3} disablePadding sx={{ display: 'block' }} onClick={() => setComponent('participant')}>
+              {!isClosed ? (
+              <ListItem key={3} disablePadding sx={{ display: 'block', ...(component === 'participant' && {backgroundColor: '#e0e0e0'}) }} onClick={() => setComponent('participant')}>
                 <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
                   <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[3].icon}</ListItemIcon>
                   <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[3].title}</ListItemText>
                 </ListItemButton>
               </ListItem>
-                  ) : null}
+              ) : null}
 
-                          {studyData.status ? (
-              <ListItem key={4} disablePadding sx={{ display: 'block' }} onClick={() => setComponent('session')}>
+              {!isClosed ? (
+              <ListItem key={4} disablePadding sx={{ display: 'block', ...(component === 'session' && {backgroundColor: '#e0e0e0'}) }} onClick={() => setComponent('session')}>
                 <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
                   <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[4].icon}</ListItemIcon>
                   <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[4].title}</ListItemText>
                 </ListItemButton>
               </ListItem>
-                          ) : null}
+              ) : null}
 
-
-
-              <ListItem key={5} disablePadding sx={{ display: 'block' }} onClick={() => setComponent('report')}>
+              <ListItem key={5} disablePadding sx={{ display: 'block' }} onClick={handleBackToHome}>
                 <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
                   <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[5].icon}</ListItemIcon>
                   <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[5].title}</ListItemText>
-                </ListItemButton>
-              </ListItem>
-
-              <ListItem key={6} disablePadding sx={{ display: 'block' }} onClick={() => navigate('/homepage')}>
-                <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
-                  <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[6].icon}</ListItemIcon>
-                  <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[6].title}</ListItemText>
                 </ListItemButton>
               </ListItem>
           </List>
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <DrawerHeader />
-              <div>
+            { studyDetailInfo.creator !== undefined && 
+            <div>
                 {
                   component === 'general' ?
-                      <StudyDetail data={studyData}/>
+                    <StudyDetail data={studyDetailInfo} isClosed={updateStudyStatus}/>
                   :
                   component === 'detail' ?
-                  <EditStudyPage/>
+                    <EditStudyPage/>
                   :
                   component === 'session' ? 
-                    <StudyResearcherContextProvider>
-                      <SessionContextProvider>
-                        <SessionManagePage/>
-                      </SessionContextProvider>
-                    </StudyResearcherContextProvider>
-                  : 
-                  component === 'participant' ?
-                  <StudyResearcherContextProvider>
-                    <StudyParticipantProvider>
-                      <DataGridProvider>
-                        <ParticipantManagePage/>
-                      </DataGridProvider>
-                    </StudyParticipantProvider>
-                  </StudyResearcherContextProvider> 
+                    <SessionManagePage/>
                   :
-                  <StudyReport data={studyData}/>
+                  component === 'participant' ?  
+                    <DataGridProvider>
+                      <ParticipantManagePage/>
+                    </DataGridProvider>
+                  :
+                  null
                 }
-              </div>
+              </div> 
+              }
+              {openResearcher && 
+                <ResearcherManagePopup open={() => handleOpenResearcher()} onClose={() => {handleCloseResearcher()}}/>
+              }
         </Box>
       </Box>
     )

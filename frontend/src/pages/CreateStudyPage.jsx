@@ -24,7 +24,8 @@ export default function CreateStudyPage() {
         recruitmentCloseDate: '',
         location: [],
         surveyLink: '',
-        driveLink: ''
+        driveLink: '',
+        isClosed: false
     });
 
     const handleSubmit = async (event) => {
@@ -36,7 +37,7 @@ export default function CreateStudyPage() {
         try {
             const response = await createStudy(studyData);
             alert('Study saved successfully!');
-            navigate('/homepage');
+            navigate(`/studyInfo/${response.study._id}`);
         } catch (error) {
             alert(error?.response?.data?.message?? "Error saving study")
             console.log("Error", error);
@@ -46,7 +47,7 @@ export default function CreateStudyPage() {
     const createStudy = async (studyData) => {
 
         try {
-            const response = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/${researcherId}`, studyData);
+            const response = await request.post(`/study/${researcherId}`, studyData);
             return response.data;
         } catch (error) {
             console.error('Error creating study:', error);

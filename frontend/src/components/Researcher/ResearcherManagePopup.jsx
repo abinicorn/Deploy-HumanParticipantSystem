@@ -39,7 +39,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 
 
-export default function ResearcherManagePopup() {
+export default function ResearcherManagePopup({open, onClose}) {
     const [researcherId, setResearcherId] = React.useState();
     const [disabledOptions, setDisabledOptions] = React.useState([]);
 
@@ -53,28 +53,28 @@ export default function ResearcherManagePopup() {
         refreshResearcherContext
     } = React.useContext(StudyResearcherContext);
 
-    const [open, setOpen] = React.useState(false);
+    //const [open, setOpen] = React.useState(false);
     const [email, setEmail] = React.useState();
     const [msgOpen, setMsgOpen] = React.useState(false);
 
-
+    /*
     const handleClickOpen= () => {
         setOpen(true);
 
     };
-
+    */
     const handleDeleteResearcher = (researcherId) => {
         removeResearcher(studyInfo._id, researcherId);
         setDisabledOptions(prevOptions => prevOptions.filter(id => id !== researcherId));
     }
-
+    /*
     const handleClose = () => {
         setOpen(false);
     };
-
+    */
 
     const handleSearchClick = async () => {
-        const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/email/${email}`);
+        const response = await request.get(`/researcher/email/${email}`);
         if (response.status === 200) {
             setMsgOpen(true);
             const newResearcherId=response.data._id;
@@ -88,7 +88,7 @@ export default function ResearcherManagePopup() {
     const handleAddRsearcher = async () => {
         try {
             console.log(researcherId);
-            const data = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/associateResearcher/${studyInfo._id}/${researcherId}`);
+            const data = await request.put(`/study/associateResearcher/${studyInfo._id}/${researcherId}`);
             if (data.status === 200) {
                 console.log("success");
                 refreshResearcherContext();
@@ -117,9 +117,9 @@ export default function ResearcherManagePopup() {
 
     return (
         <>
-            <Typography textAlign="center" onClick={handleClickOpen}>Manage Researchers</Typography>
+            
             <BootstrapDialog
-                onClose={handleClose}
+                onClose={onClose}
                 aria-labelledby="customized-dialog-title"
                 open={open}
             >
@@ -128,7 +128,7 @@ export default function ResearcherManagePopup() {
                 </DialogTitle>
                 <IconButton
                     aria-label="close"
-                    onClick={handleClose}
+                    onClick={onClose}
                     sx={{
                         position: 'absolute',
                         right: 8,

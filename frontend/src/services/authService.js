@@ -3,6 +3,8 @@ import axios from "axios";
 import { tokenService, TokenType } from "./tokenService";
 import {request} from "../utils/request";
 
+const baseUrl = process.env.REACT_APP_API_BASE_URL
+
 export const authService = {
     singIn: async (username, password) => {
             const rawData = await fetchLogin(username, password);
@@ -40,7 +42,7 @@ export const authService = {
 }
 
 const fetchLogin = async (username, password) => {
-        return  await axios.post('https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/login', {
+        return  await axios.post(`${baseUrl}/researcher/login`, {
             username,
             password,
         },
@@ -53,7 +55,7 @@ const fetchLogin = async (username, password) => {
 const fetchLogOut = async () => {
 
     try {
-        const response = await request.get('https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/logout');
+        const response = await request.get(`/researcher/logout`);
         return response;
     } catch (error) {
         throw new Error(error);

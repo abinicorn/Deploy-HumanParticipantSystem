@@ -314,7 +314,11 @@ export default function AddParticipant({ study_id }) {
                                         <ListItemText primary={file.name} />
                                     </Grid>
                                     <Grid item xs={3}>
-                                        <CloseCircleButton onClick={() => handleFileDelete(file)} size="28px" />
+                                        <CloseCircleButton 
+                                            popupText="Do you want to delete this file?"
+                                            onClick={() => handleFileDelete(file)} 
+                                            size="28px" 
+                                        />
                                     </Grid>
                                 </Grid>
                             </ListItem>

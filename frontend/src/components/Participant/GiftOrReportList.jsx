@@ -14,11 +14,11 @@ import { combineCodeSerialNum } from '../../utils/combineCodeSerialNum';
 import EmailInputComponent from '../DataGrid/EmailInputComponent';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
-export default function GiftList({ type = 'gift', open, onClose }) {
+export default function GiftList({ type, open, onClose }) {
     // const [open, setOpen] = useState(open);
     const [selectedRows, setSelectedRows] = useState([]);
     const [inputEmails, setInputEmails] = useState('');
-    const {studyParticipants, updateStudyParticipant, toggleStudyParticipantsProperty} = useContext(StudyParticipantContext);
+    const {studyParticipants, updateSentStatus, toggleStudyParticipantsProperty} = useContext(StudyParticipantContext);
     const {studyInfo} = useContext(StudyResearcherContext);
     const [openMailingList, setOpenMailingList] = useState(false);
 
@@ -45,7 +45,7 @@ export default function GiftList({ type = 'gift', open, onClose }) {
         }
 
         console.log(updatedParticipant);
-        updateStudyParticipant(updatedParticipant);
+        updateSentStatus(updatedParticipant);
     };
 
     const getTitle = () => {

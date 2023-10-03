@@ -13,12 +13,12 @@ export default function SessionContextProvider({children}) {
         data: sessions,
         isLoading: sessionLoading,
         refresh: refreshSession
-    } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/session/list/${studyId}`, [])
+    } = useGet(`/session/list/${studyId}`, [])
 
-    const { data: studyParticipantInfo } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${studyId}`, []);
+    const { data: studyParticipantInfo } = useGet(`/study-participants/${studyId}`, []);
     
     async function addSession (newSession) {
-        const sessionResponse = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/session/${studyId}`, newSession)
+        const sessionResponse = await request.post(`/session/${studyId}`, newSession)
         refreshSession();
         return sessionResponse.data
     }
@@ -26,7 +26,7 @@ export default function SessionContextProvider({children}) {
     async function updateSession (updateData) {
         
         const sessionId = updateData._id
-        const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/session/${sessionId}`, updateData)
+        const response = await request.put(`/session/${sessionId}`, updateData)
         console.log(response)
         refreshSession();
         return response.data

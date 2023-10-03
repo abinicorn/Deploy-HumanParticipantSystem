@@ -1,11 +1,6 @@
 import {useState, useEffect, createContext} from 'react';
 import { useParams } from 'react-router-dom';
 import {request} from "../utils/request";
-import axios from "axios";
-
-const CancelToken = axios.CancelToken;
-let cancel;
-
 
 export const StudyParticipantContext = createContext(undefined);
 
@@ -14,7 +9,7 @@ export default function StudyParticipantProvider({children}) {
     const [tags, setTags] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
     const [isAnonymous, setIsAnonymous] = useState(false);
-
+    const [loading, setLoading] = useState(true);
   
         // const study_id = "64fef4f7b921a503b17be43c";// 5000 SP
     // // const study_id ='64fed03dd49623d718f09a77' // 0 SP
@@ -25,65 +20,50 @@ export default function StudyParticipantProvider({children}) {
     //     data: studyparticipants,
     //     isLoading: studyparticipantsLoading,
     //     refresh: refreshStudyparticipants
-    // } = useGet(`http://localhost:3001/study-participants/${studyId}`, [])
+    // } = useGet(`/study-participants/${studyId}`, [])
 
     // const {
     //     data: studyParticipants,
     //     isLoading: studyParticipantsLoading,
     //     refresh: refreshStudyParticipants
-    // } = useGet(`http://localhost:3001/study-participants/${studyId}`, [])
+    // } = useGet(`/study-participants/${studyId}`, [])
 
     useEffect(() => {
+        
         const fetchData = async () => {
             await fetchStudyParticipants();
             await fetchTags();
         };
 
         fetchData();
-
-        return () => {
-            if (cancel) cancel();
-        };
+        
     }, [studyId]);
 
-    useEffect(() => {
-        console.log("Selected Rows Changed:", selectedRows);
-      }, [selectedRows]);
-
     async function fetchStudyParticipants() {
-        try {
-            const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${studyId}`, {
-                cancelToken: new CancelToken(function executor(c) {
-                    cancel = c;
-                })
-            });
-            if (response.status === 204) {
-                setStudyParticipants([]);
-            } else {
-                setStudyParticipants(response.data);
-            }
-        } catch (error) {
-            if (axios.isCancel(error)) {
-                console.log("Request canceled");
-            } else {
-                console.log(error);
-            }
+
+        setLoading(true);
+        const response = await request.get(`/study-participants/${studyId}`);
+        if (response.status === 204) {
+            setStudyParticipants([]);
+        } else {
+            setStudyParticipants(response.data);
         }
+        setLoading(false);
     };
 
     async function fetchTags() {
-        const response = await request.get('https://participant-system-server-68ca765c5ed2.herokuapp.com/tag/all');
+        const response = await request.get(`/tag/all`);
         setTags(response.data);
     }
     
     async function addParticipants (newParticipants) {
-        const participantsResponse = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/add`, newParticipants)
+        const participantsResponse = await request.post(`/participant/add`, newParticipants)
         return participantsResponse.data;
 
     }
 
     async function addStudyParticipants (newStudyParticipants) {
-        const response = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${studyId}`, newStudyParticipants)
+        const response = await request.post(`/study-participants/${studyId}`, newStudyParticipants)
         fetchStudyParticipants();
         return response.data;
 
@@ -99,79 +79,159 @@ export default function StudyParticipantProvider({children}) {
             });
         });
     }
-    
-    async function toggleStudyParticipantsProperty(updateData) {
-        
-        try {
-            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/toggle-property`, updateData);
-            if (response.status === 200) {
-                console.log("Successfully toggled property for the selected participants.");
-                // You can update the local state or refetch the data if needed here.
-                fetchStudyParticipants();
-            }
-        } catch (error) {
-            console.error("Error toggling property for the selected participants:", error);
-        }
-    }
 
-    async function toggleParticipantsProperty(updateData) {
-        
+    async function toggleStudyParticipantsProperty(updateData) {
         try {
-            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/toggle-property`, updateData);
+            setLoading(true);
+            const response = await request.put(`/study-participants/toggle-property`, updateData);
             if (response.status === 200) {
                 console.log("Successfully toggled property for the selected participants.");
-                // You can update the local state or refetch the data if needed here.
-                fetchStudyParticipants();
+    
+                setStudyParticipants(prevParticipants => {
+                    if(updateData.propertyName === 'isActive') {
+                        // if propertyName is 'isActive'，filter IDs that existing in updateData.ids
+                        return prevParticipants.filter(participant => !updateData.ids.includes(participant._id));
+                    } else {
+                        // if propertyName is 'isActive'，update property with IDs in updateData.ids 
+                        return prevParticipants.map(participant => 
+                            updateData.ids.includes(participant._id) 
+                                ? { ...participant, [updateData.propertyName]: !participant[updateData.propertyName] } 
+                                : participant
+                        );
+                    }
+                });
+            } else {
+                alert("Error toggling property for the selected participants.");
             }
         } catch (error) {
-            console.error("Error toggling property for the selected participants:", error);
+            alert("Error toggling property for the selected participants:", error);
+        } finally {
+            setLoading(false);
         }
     }
+    
+    async function toggleParticipantsProperty(updateData) {
+        try {
+            setLoading(true);
+            const response = await request.put(`/participant/toggle-property`, updateData);
+            if (response.status === 200) {
+                console.log("Successfully toggled property for the selected participants.");
+    
+                setStudyParticipants(prevParticipants => 
+                    prevParticipants.map(participant => 
+                        updateData.ids.includes(participant.participantInfo._id) 
+                            ? { 
+                                ...participant, 
+                                participantInfo: { 
+                                    ...participant.participantInfo, 
+                                    [updateData.propertyName]: !participant.participantInfo[updateData.propertyName] 
+                                } 
+                            } 
+                            : participant
+                    )
+                );
+            } else {
+                alert("Error toggling property for the selected participants.");
+            }
+        } catch (error) {
+            alert("Error toggling property for the selected participants:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+    
+    
+    // async function toggleStudyParticipantsProperty(updateData) {
+        
+    //     try {
+    //         const response = await request.put(`/study-participants/toggle-property`, updateData);
+    //         if (response.status === 200) {
+    //             console.log("Successfully toggled property for the selected participants.");
+    //             // You can update the local state or refetch the data if needed here.
+    //             fetchStudyParticipants();
+    //         }
+    //     } catch (error) {
+    //         console.error("Error toggling property for the selected participants:", error);
+    //     }
+    // }
+
+    // async function toggleParticipantsProperty(updateData) {
+        
+    //     try {
+    //         const response = await request.put(`/participant/toggle-property`, updateData);
+    //         if (response.status === 200) {
+    //             console.log("Successfully toggled property for the selected participants.");
+    //             // You can update the local state or refetch the data if needed here.
+    //             fetchStudyParticipants();
+    //         }
+    //     } catch (error) {
+    //         console.error("Error toggling property for the selected participants:", error);
+    //     }
+    // }
     
     // async function deleteSession (sessionId) {
-    //     const response = await axios.delete(`http://localhost:3001/session/${sessionId}`)
+    //     const response = await axios.delete(`/session/${sessionId}`)
     //     refreshSession();
     //     return response
     // }
 
-    async function finalUpdateStudyParticipant (updatedStudyParticipant) {
-        const studyParticipantResponse = await updateStudyParticipant(updatedStudyParticipant);
-        const participantResponse = await updateParticipant(updatedStudyParticipant.participantInfo);
-        // await fetchStudyParticipants();
-        return {
-            studyParticipant: studyParticipantResponse,
-            participant: participantResponse
-        };
+    async function finalUpdateStudyParticipant(updatedStudyParticipant) {
+        try {
+            setLoading(true);
+            const studyParticipantResponse = await updateStudyParticipant(updatedStudyParticipant);
+            const participantResponse = await updateParticipant(updatedStudyParticipant.participantInfo);
+            updateSpecificStudyParticipant(updatedStudyParticipant);
+            return true;
+        } catch (error) {
+            if (error.response && error.response.status === 400) {
+                alert("The email is already existing!");
+            } else {
+                alert("An error occurred while updating the participant.");
+            }
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    }
+    
+    async function updateSentStatus (updatedStudyParticipant) {
+        const response = await updateStudyParticipant(updatedStudyParticipant);
+        console.log(response)
+        if (response.status === 204) {
+            updateSpecificStudyParticipant(updatedStudyParticipant)
+        }
     }
 
     async function updateStudyParticipant (updatedStudyParticipant) {
         
-        const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${updatedStudyParticipant._id}`, updatedStudyParticipant);
-        updateSpecificStudyParticipant(updatedStudyParticipant);
-        return response.data;
+        const response = await request.put(`/study-participants/${updatedStudyParticipant._id}`, updatedStudyParticipant);
+        return response;
     }
 
     async function updateParticipant (updatedParticipant) {
         const validatedParticipant = await validateAndUpdateTags(updatedParticipant);
         console.log(validatedParticipant);
-        const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/${validatedParticipant._id}`, validatedParticipant);
+        const response = await request.put(`/participant/${validatedParticipant._id}`, validatedParticipant);
         return response.data;
     }
 
     async function setStudyParticipantNotActive (studyParticipant) {
+        setLoading(true);
         studyParticipant.isActive = false;
-        const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study-participants/${studyParticipant._id}`, studyParticipant);
+        const response = await request.put(`/study-participants/${studyParticipant._id}`, studyParticipant);
         if (response.status === 204) {
             // Remove the studyParticipant from studyParticipants list
             setStudyParticipants(prevParticipants =>
                 prevParticipants.filter(participant => participant._id !== studyParticipant._id)
             );
         }
+        setLoading(false);
         return response;
     }
 
     async function addTags (newTags) {
-        const response = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/tag/add`, newTags);
+        console.log(newTags)
+        const response = await request.post(`/tag/add`, newTags);
         return response.data.success;
     }
 
@@ -204,6 +264,7 @@ export default function StudyParticipantProvider({children}) {
     }
 
     async function handleAddTagToSelectedRows (newTagName) {
+        setLoading(true);
         // 检查新标签是否已存在于 tags 中
         const tagExists = tags.some(tag => tag.tagName === newTagName);
         let newTagId = null;
@@ -221,6 +282,7 @@ export default function StudyParticipantProvider({children}) {
         }
     
         const updateIds = [];
+        const updatedParticipants = [];
 
         // 遍历所有选中的参与者
         studyParticipants.filter(participant => selectedRows.includes(participant._id))
@@ -239,8 +301,8 @@ export default function StudyParticipantProvider({children}) {
                         tag: [...participant.participantInfo.tag, newTagId]
                     }
                 };
-                // 使用 updateSpecificStudyParticipant 方法保存更改
-                updateSpecificStudyParticipant(updatedParticipant);
+                // store updatedParticipant
+                updatedParticipants.push(updatedParticipant);
             }
         })
 
@@ -250,22 +312,31 @@ export default function StudyParticipantProvider({children}) {
                 tagId: newTagId
             };
 
-            console.log(updatePayload)
-            
-            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/update-tag`, updatePayload);
-            if (response) {
-                console.log(`Added ${newTagName} tag to ${response.data} participants`);
-            } else {
-                console.log(`Failed to add ${newTagName} tag to selected participants`);
+            try {
+                const response = await request.put(`/participant/update-tag`, updatePayload);
+                console.log(response)
+                if (response) {
+                    console.log(`Added '${newTagName}' tag to ${response.data.message}`);
+                    // success, update all local studyparticipants
+                    updatedParticipants.forEach(participant => {
+                        updateSpecificStudyParticipant(participant);
+                    });
+                } else {
+                    alert(`Failed to add '${newTagName}' tag to selected participants`);
+                }
+            } catch {
+                alert(`Failed to add '${newTagName}' tag to selected participants`)
             }
-            
         }
+        setLoading(false);
     };
 
     async function handleRemoveTagFromSelectedRows(tagNameToRemove) {
 
+        setLoading(true);
         const removeTagId = tags.find(tag => tag.tagName === tagNameToRemove)?._id || null;
         const deleteIds = [];
+        const updatedParticipants = [];
         // 遍历所有选中的参与者
         studyParticipants.filter(participant => selectedRows.includes(participant._id))
         .forEach(participant => {
@@ -287,8 +358,8 @@ export default function StudyParticipantProvider({children}) {
                     }
                 };
                 
-                // 使用 updateSpecificStudyParticipant 方法保存更改
-                updateSpecificStudyParticipant(updatedParticipant);
+                // store updatedParticipant
+                updatedParticipants.push(updatedParticipant);
             }
         });
 
@@ -298,16 +369,23 @@ export default function StudyParticipantProvider({children}) {
                 tagId: removeTagId
             };
 
-            console.log(deletePayload)
-            
-            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/participant/delete-tag`, deletePayload);
-            if (response) {
-                console.log(`Deleteded ${tagNameToRemove} tag from ${response.data} participants`);
-            } else {
-                console.log(`Failed to delete ${tagNameToRemove} tag to selected participants`);
+            try {
+                const response = await request.put(`/participant/delete-tag`, deletePayload);
+                if (response && response.status === 200) {
+                    console.log(`Deleted '${tagNameToRemove}' tag from ${response.data.message}`);
+                    // success, update all local studyparticipants
+                    updatedParticipants.forEach(participant => {
+                        updateSpecificStudyParticipant(participant);
+                    });
+                } else {
+                    alert(`Failed to delete '${tagNameToRemove}' tag to selected participants`);
+                }
+            } catch (error) {
+                alert(`Failed to delete '${tagNameToRemove}' tag to selected participants`);
             }
             
         }
+        setLoading(false);
     }
         
 
@@ -320,6 +398,7 @@ export default function StudyParticipantProvider({children}) {
         addParticipants,
         addStudyParticipants,
         updateStudyParticipant,
+        updateSentStatus,
         updateSpecificStudyParticipant,
         toggleStudyParticipantsProperty,
         toggleParticipantsProperty,
@@ -328,6 +407,7 @@ export default function StudyParticipantProvider({children}) {
         fetchTags,
         handleAddTagToSelectedRows,
         handleRemoveTagFromSelectedRows,
+        loading, setLoading,
         selectedRows, 
         setSelectedRows,
         isAnonymous, 

@@ -8,6 +8,7 @@ import OptionPopup from '../Popup/OptionPopup';
 import { SessionContext } from '../../providers/SessionContextProvider';
 import { combineCodeSerialNum } from '../../utils/combineCodeSerialNum';
 import { StudyResearcherContext } from '../../providers/StudyResearcherContextProvider';
+import { StudyParticipantContext } from '../../providers/StudyPaticipantsProvider';
 
 function not(a, b) {
   return a.filter((value) => b.indexOf(value) === -1);
@@ -25,7 +26,8 @@ export default function CreateEditSession({create, targetSessionId}) {
   
   const scroll ='paper';
   const { studyInfo } = React.useContext(StudyResearcherContext);
-  const { sessions, studyParticipantInfo, addSession, updateSession, refreshSession} = React.useContext(SessionContext);
+  const { studyParticipants } = React.useContext(StudyParticipantContext);
+  const { sessions, addSession, updateSession, refreshSession} = React.useContext(SessionContext);
   const targetSession = sessions.find(s => s._id === targetSessionId);
   const studyId = useParams();
   const [sessionContent, setSessionContent] = React.useState({
@@ -33,7 +35,8 @@ export default function CreateEditSession({create, targetSessionId}) {
     sessionCode: '',
     date:'', 
     time:'', 
-    location:'', 
+    location:'',
+    note: '', 
     participantNum: 0,
     isArchive: 'false'
   })
@@ -117,14 +120,15 @@ export default function CreateEditSession({create, targetSessionId}) {
       sessionCode: '',
       date:'', 
       time:'', 
-      location:'', 
+      location:'',
+      note: '', 
       participantNum: 0,
     isArchive: 'false'
     })
     setRight([])
-    if(studyParticipantInfo) {
-      studyParticipantInfo.sort((a,b) => a.serialNum - b.serialNum);
-      setLeft(studyParticipantInfo);
+    if(studyParticipants) {
+      studyParticipants.sort((a,b) => a.serialNum - b.serialNum);
+      setLeft(studyParticipants);
     }
     setOpen(true);
   };
@@ -137,13 +141,14 @@ export default function CreateEditSession({create, targetSessionId}) {
       sessionCode: targetSession.sessionCode,
       date: targetSession.date, 
       time: targetSession.time, 
-      location: targetSession.location, 
+      location: targetSession.location,
+      note: targetSession.note, 
       participantNum: targetSession.participantNum,
     })
 
     let editParticipantList =[]
-    if(studyParticipantInfo) {
-      editParticipantList = studyParticipantInfo.reduce(
+    if(studyParticipants) {
+      editParticipantList = studyParticipants.reduce(
         (result, item) =>
         targetSession.participantList.some(el => el._id === item.participantInfo._id)
             ? [...result, item]
@@ -155,8 +160,8 @@ export default function CreateEditSession({create, targetSessionId}) {
     setRight(editParticipantList);
     
     let editStudyParticipantList = []
-    if(studyParticipantInfo) {
-      editStudyParticipantList = studyParticipantInfo.filter(function(el) {return !editParticipantList.includes(el)});
+    if(studyParticipants) {
+      editStudyParticipantList = studyParticipants.filter(function(el) {return !editParticipantList.includes(el)});
       editStudyParticipantList.sort((a,b) => a.serialNum - b.serialNum)
     }
     setLeft(editStudyParticipantList);
@@ -169,7 +174,7 @@ export default function CreateEditSession({create, targetSessionId}) {
 
   const handleCreate = () => {
     
-    if (!sessionContent.date|| !sessionContent.time || !sessionContent.location || !sessionContent.participantNum) {
+    if (!sessionContent.date|| !sessionContent.participantNum) {
       alert("Please fill in all required fields.");
       return
     }
@@ -291,10 +296,14 @@ export default function CreateEditSession({create, targetSessionId}) {
             flexDirection={'row'}
           >
             <Box display={'flex'} flexDirection={'column'} sx={{marginLeft: 15, marginRight: 5}}>
+              <h3 style={{margin: 0}}>Date</h3>
               <TextField required id="outlined-required" type="date" name="date" variant="outlined" margin="normal" onChange={handleSessionChange} value={sessionContent.date.slice(0, 10)}/>
-              <TextField required id="outlined-required" type='time' name="time" variant="outlined" margin="normal" onChange={handleSessionChange} value={sessionContent.time}/>
-              <TextField required id="outlined-required" label="Location" name="location" variant="outlined" margin="normal" onChange={handleSessionChange} value={sessionContent.location}/>
-              <TextField required id="outlined-required" label="Number of Participants" name="participantNum" variant="outlined" margin="normal" onChange={handleSessionChange} value={sessionContent.participantNum}/>
+              <h3 style={{margin: 0, marginTop:5}}>Time</h3>
+              <TextField id="outlined-required" type='time' name="time" variant="outlined" margin="normal" onChange={handleSessionChange} value={sessionContent.time}/>
+              <h3 style={{margin: 0, marginTop:5}}>Location/Online Link</h3>
+              <TextField id="outlined-required" name="location" variant="outlined" margin="normal" onChange={handleSessionChange} value={sessionContent.location}/>
+              <h3 style={{margin: 0, marginTop:5}}>Expected number of Participants</h3>
+              <TextField required id="outlined-required" name="participantNum" variant="outlined" margin="normal" onChange={handleSessionChange} value={sessionContent.participantNum}/>
               <h3>Participant List</h3>
               <Box display={'flex'} flexDirection={'row'} >
                 <Grid container spacing={2} justifyContent="center" alignItems="center">
@@ -326,6 +335,19 @@ export default function CreateEditSession({create, targetSessionId}) {
                   <Grid item>{customList('Chosen Participants', right)}</Grid>
                 </Grid>
               </Box>
+              <h3 style={{margin: 0, marginTop:10}}>Notes</h3>
+              <TextField
+                fullWidth
+                id="outlined-multiline-static"
+                label="Write your notes here"
+                name="note"
+                value={sessionContent.note}
+                onChange={handleSessionChange}
+                multiline
+                rows={5}
+                variant="outlined"
+                margin="dense"
+              />
             </Box>
           </Box>
         </DialogContent>
@@ -337,7 +359,7 @@ export default function CreateEditSession({create, targetSessionId}) {
             onConfirm={handleClose} sx={{marginRight: 5}}/>
           <OptionPopup 
             buttonText={'Cancel'} 
-            popupText={'Are you sure you want to discard the saving?'} 
+            popupText={'Do you want to cancel?'} 
             onClick={handleClose}/>
         </DialogActions>
       </Dialog>

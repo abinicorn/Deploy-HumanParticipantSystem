@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Chip, Typography, Box, Button, Menu, MenuItem, TextField } from '@mui/material';
+import {Chip, Typography, Box, Button, Menu, MenuItem, TextField, LinearProgress } from '@mui/material';
 import {styled} from '@mui/material/styles'
 import { DataGrid, GridToolbar, GRID_CHECKBOX_SELECTION_COL_DEF, gridPageCountSelector,
 GridPagination, useGridApiContext, useGridSelector } from '@mui/x-data-grid';
@@ -22,11 +22,10 @@ import '../../styles/DataGrid.css';
 
 
 export default function ParticipantsTable() {
-    console.log("Start to render datagrid");
 
     const {studyParticipants, finalUpdateStudyParticipant, toggleStudyParticipantsProperty, 
           toggleParticipantsProperty, handleAddTagToSelectedRows, handleRemoveTagFromSelectedRows,
-          isAnonymous, selectedRows, setSelectedRows, setStudyParticipantNotActive} = useContext(StudyParticipantContext);
+          isAnonymous, selectedRows, setSelectedRows, loading, setLoading, setStudyParticipantNotActive} = useContext(StudyParticipantContext);
     
     const {
       sortModel, setSortModel,
@@ -42,13 +41,16 @@ export default function ParticipantsTable() {
     const [newTag, setNewTag] = useState('');
 
     const gridStyle = studyParticipants.length === 0
-    ? { height: '55vh', width: '99%' }
-    : { height: '100%', width: '99%' };
+    ? { height: '55vh',
+    // width: '99%' 
+  }
+    : { height: '100%',
+    // width: '99%' 
+  };
 
     const handleUpdateParticipant = async (updatedParticipant) => {
       const response = await finalUpdateStudyParticipant(updatedParticipant);
-      console.log(response);
-
+      return response;
     };
 
     const handleDelete = async (studyParticipant) => {
@@ -175,7 +177,7 @@ export default function ParticipantsTable() {
             valueGetter: (params) => {
               const firstName = params.row.participantInfo?.firstName || "";
               const lastName = params.row.participantInfo?.lastName || "";
-
+          
               return `${firstName} ${lastName}`.trim();
             }
           }
@@ -318,9 +320,7 @@ export default function ParticipantsTable() {
             renderCell: (params) => (
                 <EditParticipant 
                     participant={params.row} 
-                    onSave={(updatedParticipant) => {
-                        handleUpdateParticipant(updatedParticipant);
-                    }}
+                    onSave={handleUpdateParticipant}
                     isAnonymous={isAnonymous}
                 />
             )
@@ -342,6 +342,7 @@ export default function ParticipantsTable() {
 
     return (
       <div style={gridStyle} >
+  
           <Box mb={1} display='flex' justifyContent='space-between' height="35px"  alignItems='center'>
             {selectedRows.length > 0 && 
               <>
@@ -405,6 +406,7 @@ export default function ParticipantsTable() {
                 rows={reorderRowsBasedOnSelection(studyParticipants, selectedRows)}
                 // rows={Array.isArray(studyParticipants) ? studyParticipants : []}
                 columns={columns}
+                loading={loading}
                 // columnVisibilityModel={{
                 //     // Hide column note at the beginning, the other columns will remain visible
                 //     hidden: ['note']
@@ -445,6 +447,7 @@ export default function ParticipantsTable() {
                 slots={{
                     pagination: CustomPagination,
                     noRowsOverlay: CustomNoRowsOverlay,
+                    //loadingOverlay: LinearProgress,
                     toolbar: GridToolbar
                 }}
                 pageSizeOptions={[25, 50, 100]}
@@ -470,5 +473,6 @@ export default function ParticipantsTable() {
                 // hideFooterSelectedRowCount
             />
         </div>
+
     )
 }

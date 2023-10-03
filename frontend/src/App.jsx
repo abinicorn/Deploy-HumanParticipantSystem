@@ -1,14 +1,11 @@
 import './styles/App.css';
-import SessionManagePage from './pages/SessionManagePage';
 import SessionContextProvider from './providers/SessionContextProvider';
 import Login from "./pages/LoginPage";
 import React from "react";
-import StudyParticipantsProvider from './providers/StudyPaticipantsProvider'
-import ParticipantManagePage from './pages/ParticipantManagePage'
+import StudyParticipantProvider from './providers/StudyPaticipantsProvider'
 import ResearcherManagePopup from './components/Researcher/ResearcherManagePopup';
 import {StudyResearcherContextProvider} from './providers/StudyResearcherContextProvider';
 import CreateStudyPage from './pages/CreateStudyPage';
-import EditStudyPage from './pages/EditStudyPage';
 import { CurrentUserContextProvider } from './providers/CurrentUserProvider';
 import ResearcherDashboardPage from './pages/ResearcherDashboardPage';
 import ResearcherProfilePage from './pages/ResearcherProfilePage';
@@ -55,7 +52,13 @@ function App() {
       path: '/studyInfo/:studyId',
       element: (
         <MainLayout>
-          <SingleStudyPage/>
+          <StudyResearcherContextProvider>
+            <StudyParticipantProvider>
+              <SessionContextProvider>
+                <SingleStudyPage/>
+              </SessionContextProvider>
+            </StudyParticipantProvider>
+          </StudyResearcherContextProvider>        
         </MainLayout>
       )
     },

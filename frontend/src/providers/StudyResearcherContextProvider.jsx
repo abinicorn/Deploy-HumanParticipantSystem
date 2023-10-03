@@ -6,7 +6,8 @@ import {request} from "../utils/request";
 
 const StudyResearcherContext = React.createContext({
     researcherList: [],
-    studyInfo: {}
+    studyInfo: {},
+    studyDetailInfo: {}
 });
 
 function StudyResearcherContextProvider({pageItemId, children}) {
@@ -22,33 +23,40 @@ function StudyResearcherContextProvider({pageItemId, children}) {
 
     const { 
         data: studyInfo,
-        isLoadig: studyLoading,
+        isLoading: studyLoading,
         refresh: refreshStudyContext
-    } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/${studyIdToUse}`,[]);
+    } = useGet(`/study/${studyIdToUse}`,[]);
 
     const{
         data: researcherList,
-        isLoadig: researcherLoading,
+        isLoading: researcherLoading,
         refresh: refreshResearcherContext
-    } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/researcher/list/${studyIdToUse}`,[]);
+    } = useGet(`/study/researcher/list/${studyIdToUse}`,[]);
 
     const {
         data: allResearchers,
-        isLoadig: allResearchersLoading,
+        isLoading: allResearchersLoading,
         refresh: refreshAllResearchersContext
-    } = useGet(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/allResearchers`,[]);
+    } = useGet(`/researcher/allResearchers`,[]);
+
+    const {
+        data: studyDetailInfo,
+        isLoading: studyDetailInfoLoading,
+        refresh: refreshStudyDetailContext
+    } = useGet(`/study/studyReport/${studyIdToUse}`, [])
     
 
 
     React.useEffect(() => {
         refreshStudyContext();
+        refreshStudyDetailContext();
     }, [studyIdToUse]);
     
 
     //to do
     async function addResearcher (newResearcher) { 
         try{
-            const researcherResponse = await request.post(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/addResearcher/${studyIdToUse}`, newResearcher)
+            const researcherResponse = await request.post(`/study/addResearcher/${studyIdToUse}`, newResearcher)
             console.log(researcherResponse);
             refreshResearcherContext();
             return researcherResponse.data;
@@ -59,7 +67,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
 
     async function removeResearcher (studyId, researcherId) {
         try {
-            const response = await request.put(`https://participant-system-server-68ca765c5ed2.herokuapp.com/study/removeResearcher/${studyIdToUse}/${researcherId}`);
+            const response = await request.put(`/study/removeResearcher/${studyIdToUse}/${researcherId}`);
             refreshResearcherContext();
             return response.data;
         } catch (error) {
@@ -69,7 +77,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
 
 
     async function fetchResearcherbyEmail (email) {
-        const response = await request.get(`https://participant-system-server-68ca765c5ed2.herokuapp.com/researcher/email/${email}`);
+        const response = await request.get(`/researcher/email/${email}`);
         return response;
     }
 
@@ -85,7 +93,10 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         refreshAllResearchersContext,
         addResearcher,
         removeResearcher,
-        fetchResearcherbyEmail
+        fetchResearcherbyEmail,
+        studyDetailInfo,
+        studyDetailInfoLoading,
+        refreshStudyDetailContext,
     }
 
     return (

@@ -61,6 +61,7 @@ const StyledMenu = styled((props) => (
 export default function StudyParticipantActionBtn({ context, selectedRows }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openGiftList, setOpenGiftList] = React.useState(false);
+  const [openReportList, setOpenReportList] = React.useState(false);
   const [openMailingList, setOpenMailingList] = React.useState(false);
   const [openTablePopUp, setOpenTablePopUp] = React.useState(false);
   const {selectRowsByEmails, setSelectRowsByEmails} = React.useContext(DataGridContext);
@@ -76,6 +77,10 @@ export default function StudyParticipantActionBtn({ context, selectedRows }) {
 
   const handleOpenGiftList = () => {
     setOpenGiftList(true);
+  };
+
+  const handleOpenReportList = () => {
+    setOpenReportList(true);
   };
   
   const handleOpenMailingList = () => {
@@ -114,7 +119,7 @@ export default function StudyParticipantActionBtn({ context, selectedRows }) {
           <RedeemIcon />
           Show Gift List
         </MenuItem>
-        <MenuItem onClick={handleOpenGiftList}>
+        <MenuItem onClick={handleOpenReportList}>
           <DescriptionIcon />
           Show Report Recipients
         </MenuItem>
@@ -137,6 +142,7 @@ export default function StudyParticipantActionBtn({ context, selectedRows }) {
         </MenuItem>
       </StyledMenu>
       {openGiftList && <GiftOrReportList type='gift' open={() => handleOpenGiftList} onClose={() => setOpenGiftList(false)}/>}
+      {openReportList && <GiftOrReportList type='report' open={() => handleOpenReportList} onClose={() => setOpenReportList(false)}/>}
       {openMailingList && <MailingList context={context} selectedRows={selectedRows} open={() => handleOpenMailingList} onClose={() => setOpenMailingList(false)}/>}
       {openTablePopUp && <StudyParticipantTablePopUp open={() => handleOpenTablePopUp} onClose={() => setOpenTablePopUp(false)}/>}
     </div>

@@ -5,3 +5,15 @@
 .MuiTablePagination-root {
     overflow: visible !important;
 }
+
+@media (min-resolution: 1dppx) {
+    .participant-Table-Pop-Up {
+        height: 87vh;
+    }
+}
+
+@media (min-resolution: 1.25dppx) {
+    .participant-Table-Pop-Up {
+        height: 83vh;
+    }
+}

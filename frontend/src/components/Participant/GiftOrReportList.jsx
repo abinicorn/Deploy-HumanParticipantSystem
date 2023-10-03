@@ -21,6 +21,7 @@ export default function GiftList({ type, open, onClose }) {
     const {studyParticipants, updateSentStatus, toggleStudyParticipantsProperty} = useContext(StudyParticipantContext);
     const {studyInfo} = useContext(StudyResearcherContext);
     const [openMailingList, setOpenMailingList] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     // const handleClose = () => {
     //     setOpen(false);
@@ -34,7 +35,8 @@ export default function GiftList({ type, open, onClose }) {
         setOpenMailingList(false);
     };
 
-    const handleToggleSentStatus = (_id) => {
+    const handleToggleSentStatus = async (_id) => {
+        setLoading(true);
         const participantToUpdate = studyParticipants.find(p => p._id === _id);
         let updatedParticipant;
 
@@ -45,7 +47,14 @@ export default function GiftList({ type, open, onClose }) {
         }
 
         console.log(updatedParticipant);
-        updateSentStatus(updatedParticipant);
+        try {
+            await updateSentStatus(updatedParticipant);
+        } catch (error) {
+            console.error("Error changing participant:", error);
+        } finally {
+            setLoading(false);
+        }
+
     };
 
     const getTitle = () => {
@@ -70,10 +79,13 @@ export default function GiftList({ type, open, onClose }) {
     };
 
     async function updateSelectedStudyParticipants(data) {
+        setLoading(true);
         try {
             await toggleStudyParticipantsProperty(data);
         } catch (error) {
             console.error("Error changing selected participants:", error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -185,6 +197,7 @@ export default function GiftList({ type, open, onClose }) {
                         </Box>
                         <Box height="60vh">
                             <StyledDataGrid
+                                loading={loading}
                                 rows={reorderRowsBasedOnSelection(rows, selectedRows)}
                                 columns={columns}
                                 getRowId={(row) => row._id}

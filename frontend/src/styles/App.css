@@ -51,7 +51,7 @@
 .align-right {
   display: flex !important;
   justify-content: right !important;
-  margin: 10px;
+  margin: 5px;
 }
 
 .background-image {

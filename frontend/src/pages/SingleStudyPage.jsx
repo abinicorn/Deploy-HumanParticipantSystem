@@ -9,12 +9,12 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import EditIcon from '@mui/icons-material/Edit';
 import PeopleIcon from '@mui/icons-material/People';
-import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
+// import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DescriptionIcon from '@mui/icons-material/Description';
 import TopicIcon from '@mui/icons-material/Topic';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import ResearcherManagePopup from '../components/Researcher/ResearcherManagePopup'; 
+// import ResearcherManagePopup from '../components/Researcher/ResearcherManagePopup'; 
 import SessionManagePage from './SessionManagePage';
 import EditStudyPage from './EditStudyPage';
 import ParticipantManagePage from './ParticipantManagePage';
@@ -104,7 +104,6 @@ export default function SingleStudyPage() {
         refreshStudyDetailContext
     } = React.useContext(StudyResearcherContext);
 
-    console.log(studyDetailInfo.isClosed);
     const [isClosed, setIsClosed] = React.useState(true);
 
     useEffect(()=>{
@@ -117,13 +116,13 @@ export default function SingleStudyPage() {
 
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
-    const [openResearcher, setOpenResearcher] = React.useState(false);
+    // const [openResearcher, setOpenResearcher] = React.useState(false);
 
     const navigate = useNavigate();
     const settings = ['Profile', 'Logout'];
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-    const {user}= useCurrentUser();
+    // const {user}= useCurrentUser();
     const {studyInfo}=React.useContext(StudyResearcherContext);
 
     function createData(icon, title) {
@@ -133,7 +132,7 @@ export default function SingleStudyPage() {
     const actionList = [
         createData(<DescriptionIcon/>, 'Study Detail'),
         createData(<EditIcon/>, 'Edit Study Detail'),
-        createData(<PeopleOutlineIcon/>, 'Manage Researchers'),
+        // createData(<PeopleOutlineIcon/>, 'Manage Researchers'),
         createData(<PeopleIcon/>, 'Manage Participants'),
         createData(<CalendarMonthIcon/>, 'Manage Sessions'),
         createData(<HomeOutlinedIcon/>, 'Back to Dashboard')
@@ -160,22 +159,22 @@ export default function SingleStudyPage() {
         setComponent('general');
         navigate('/researcher/profile')
       } else if (setting === 'Logout') {
-        setComponent('general');  
+        setComponent('general');
         await authService.signOut();
           navigate('/')
       }
       handleCloseUserMenu();
     };
 
-    const handleOpenResearcher = () => {
-      setComponent('general')
-      setOpenResearcher(true);
-    };
+    // const handleOpenResearcher = () => {
+    //   setComponent('general')
+    //   setOpenResearcher(true);
+    // };
 
-    const handleCloseResearcher = () => {
-      setOpenResearcher(false);
-      // navigate(`/studyInfo/${studyId}`);
-    }
+    // const handleCloseResearcher = () => {
+    //   setOpenResearcher(false);
+    //   // navigate(`/studyInfo/${studyId}`);
+    // }
 
   // Function to get the current component state from local storage
     const getCurrentComponentFromLocalStorage = () => {
@@ -287,8 +286,17 @@ export default function SingleStudyPage() {
               </ListItem>
               ) : null}
 
-              {!isClosed && studyInfo.creator === user.userId ? (
+              {/* {!isClosed && studyInfo.creator === user.userId ? (
               <ListItem key={2} disablePadding sx={{ display: 'block' }} onClick={handleOpenResearcher}>
+                <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
+                  <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[2].icon}</ListItemIcon>
+                  <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[2].title}</ListItemText>
+                </ListItemButton>
+              </ListItem>
+              ) : null} */}
+
+              {!isClosed ? (
+              <ListItem key={2} disablePadding sx={{ display: 'block', ...(component === 'participant' && {backgroundColor: '#e0e0e0'}) }} onClick={() => setComponent('participant')}>
                 <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
                   <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[2].icon}</ListItemIcon>
                   <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[2].title}</ListItemText>
@@ -296,8 +304,8 @@ export default function SingleStudyPage() {
               </ListItem>
               ) : null}
 
-              {!isClosed ? (
-              <ListItem key={3} disablePadding sx={{ display: 'block', ...(component === 'participant' && {backgroundColor: '#e0e0e0'}) }} onClick={() => setComponent('participant')}>
+              {!isClosed && studyInfo.isAnonymous !== true ?  (
+              <ListItem key={3} disablePadding sx={{ display: 'block', ...(component === 'session' && {backgroundColor: '#e0e0e0'}) }} onClick={() => setComponent('session')}>
                 <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
                   <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[3].icon}</ListItemIcon>
                   <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[3].title}</ListItemText>
@@ -305,26 +313,17 @@ export default function SingleStudyPage() {
               </ListItem>
               ) : null}
 
-              {!isClosed ? (
-              <ListItem key={4} disablePadding sx={{ display: 'block', ...(component === 'session' && {backgroundColor: '#e0e0e0'}) }} onClick={() => setComponent('session')}>
+              <ListItem key={4} disablePadding sx={{ display: 'block' }} onClick={handleBackToHome}>
                 <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
                   <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[4].icon}</ListItemIcon>
                   <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[4].title}</ListItemText>
-                </ListItemButton>
-              </ListItem>
-              ) : null}
-
-              <ListItem key={5} disablePadding sx={{ display: 'block' }} onClick={handleBackToHome}>
-                <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
-                  <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[5].icon}</ListItemIcon>
-                  <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[5].title}</ListItemText>
                 </ListItemButton>
               </ListItem>
           </List>
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <DrawerHeader />
-            { studyDetailInfo.creator !== undefined && 
+            { studyDetailInfo.creator !== undefined &&
             <div>
                 {
                   component === 'general' ?
@@ -336,18 +335,18 @@ export default function SingleStudyPage() {
                   component === 'session' ? 
                     <SessionManagePage/>
                   :
-                  component === 'participant' ?  
+                  component === 'participant' ?
                     <DataGridProvider>
                       <ParticipantManagePage/>
                     </DataGridProvider>
                   :
                   null
                 }
-              </div> 
+              </div>
               }
-              {openResearcher && 
+              {/* {openResearcher && 
                 <ResearcherManagePopup open={() => handleOpenResearcher()} onClose={() => {handleCloseResearcher()}}/>
-              }
+              } */}
         </Box>
       </Box>
     )

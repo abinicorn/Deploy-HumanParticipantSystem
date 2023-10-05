@@ -24,6 +24,7 @@ import MsgPopup from '../Popup/MsgPopup';
 import DeletePopupButton from '../Button/DeletePopupButton';
 import Autocomplete from '@mui/material/Autocomplete';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 
 
 
@@ -39,7 +40,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 
 
-export default function ResearcherManagePopup({open, onClose}) {
+export default function ResearcherManagePopup() {
     const [researcherId, setResearcherId] = React.useState();
     const [disabledOptions, setDisabledOptions] = React.useState([]);
 
@@ -50,28 +51,31 @@ export default function ResearcherManagePopup({open, onClose}) {
         allResearchers,
         removeResearcher,
         fetchResearcherbyEmail,
-        refreshResearcherContext
+        refreshResearcherContext,
+        refreshStudyDetailContext
     } = React.useContext(StudyResearcherContext);
 
-    //const [open, setOpen] = React.useState(false);
+
+
+    const [open, setOpen] = React.useState(false);
     const [email, setEmail] = React.useState();
     const [msgOpen, setMsgOpen] = React.useState(false);
 
-    /*
+    
     const handleClickOpen= () => {
         setOpen(true);
 
     };
-    */
+    
     const handleDeleteResearcher = (researcherId) => {
         removeResearcher(studyInfo._id, researcherId);
         setDisabledOptions(prevOptions => prevOptions.filter(id => id !== researcherId));
     }
-    /*
+    
     const handleClose = () => {
         setOpen(false);
     };
-    */
+    
 
     const handleSearchClick = async () => {
         const response = await request.get(`/researcher/email/${email}`);
@@ -115,11 +119,12 @@ export default function ResearcherManagePopup({open, onClose}) {
     ) : null;
 
 
+
     return (
         <>
-            
+            <Button variant="contained" onClick={handleClickOpen}> <PeopleOutlineIcon/>  Manage Researchers </Button>
             <BootstrapDialog
-                onClose={onClose}
+                onClose={handleClose}
                 aria-labelledby="customized-dialog-title"
                 open={open}
             >
@@ -128,7 +133,7 @@ export default function ResearcherManagePopup({open, onClose}) {
                 </DialogTitle>
                 <IconButton
                     aria-label="close"
-                    onClick={onClose}
+                    onClick={handleClose}
                     sx={{
                         position: 'absolute',
                         right: 8,

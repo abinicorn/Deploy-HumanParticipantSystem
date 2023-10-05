@@ -43,7 +43,11 @@ export default function ResearcherProfilePage() {
         }));
     }
 
+    const [isEmailUpdate, setIsEmailUpdate] = useState(false);
+
     const handEmailChange = (event) => {
+
+        setIsEmailUpdate(currentUserInfo.currentEmail !== event.target.value);
         setCurrentUserInfo((prevUserInfo) => ({
             ...prevUserInfo,
             currentEmail: event.target.value,
@@ -53,13 +57,32 @@ export default function ResearcherProfilePage() {
 
     const updateInfo = async () => {
         const url = '/researcher/update/info';
+        let req;
 
-        const req = {
-            firstName: currentUserInfo.currentFirstName,
-            lastName: currentUserInfo.currentLastName,
-            email: currentUserInfo.currentEmail,
-            id: user.userId
+        if (isEmailUpdate){
+            const isEmailExist = await checkEmailExist(currentUserInfo.currentEmail);
+
+            if (isEmailExist) {
+                alert('This email is existed, please try another one!');
+                return;
+            }
+
+
+            req = {
+                firstName: currentUserInfo.currentFirstName,
+                lastName: currentUserInfo.currentLastName,
+                id: user.userId
+            }
+        } else {
+            req = {
+                firstName: currentUserInfo.currentFirstName,
+                lastName: currentUserInfo.currentLastName,
+                email: currentUserInfo.currentEmail,
+                id: user.userId
+            }
         }
+
+
 
         request.put(url, req)
             .then(response => {
@@ -70,6 +93,13 @@ export default function ResearcherProfilePage() {
             });
 
     }
+    const checkEmailExist = async (email) => {
+
+            const res = await request.get(`/researcher/email/${email}`);
+
+            return res.status === 200;
+
+    };
 
 
     const navigate = useNavigate();

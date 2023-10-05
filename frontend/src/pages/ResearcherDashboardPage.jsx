@@ -15,6 +15,8 @@ import {request} from "../utils/request";
 import { Link } from 'react-router-dom';
 import {CustomNoRowsOverlayDashboard} from "../styles/CustomNoRowsOverlay";
 import {StyledDataGrid} from "../styles/StyledDataGrid";
+import OptionPopup from "../components/Popup/OptionPopup";
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 
 
 
@@ -34,8 +36,20 @@ export default function ResearcherDashboardPage() {
                         setLoading(true)
                         const studyInfoList = await request.get(`/researcher/studyList/${user.userId}`);
 
-                        setStudyList(studyInfoList.data);
-                    
+                        setAllStudyList(getStudyList(studyInfoList.data));
+
+                        setCurrentRows(getStudyList(studyInfoList.data));
+
+                        const currentTime = new Date().getTime();
+
+                        const expiredProjects = studyInfoList.data.filter(study => {
+                            const closeDate = new Date(study.recruitmentCloseDate).getTime();
+                            return closeDate < currentTime && !study.status;
+                        });
+
+                        setExpiredStudyList(getStudyList(expiredProjects));
+
+
                     } catch (error) {
                         console.error('Error fetching study data:', error);
                     } finally {
@@ -49,34 +63,53 @@ export default function ResearcherDashboardPage() {
     },[user])
 
 
-    const [studyList, setStudyList] = useState(null);
 
-    const handleNameClick = (item) => {
-        setSelectedStudy(item);
-        setIsStudyDetailPopupOpen(true);
+    const [expiredStudyList, setExpiredStudyList] = useState([]);
+
+    const [allStudyList, setAllStudyList] = useState(null);
+
+
+    const [currentRows, setCurrentRows] = useState([]);
+    const [isAlternateRows, setIsAlternateRows] = useState(false);
+
+
+
+    const toggleRows = () => {
+        if (isAlternateRows) {
+            setCurrentRows(allStudyList);
+        } else {
+            setCurrentRows(expiredStudyList);
+        }
+        setIsAlternateRows(!isAlternateRows);
     };
 
 
-    const rows = (studyList || []).map((studyInfo, index) => ({
-        id: index + 1,
-        studyId: studyInfo.studyId,
-        studyCode: studyInfo.studyCode,
-        name: studyInfo.studyName,
-        participantProgress: { value: studyInfo.participantCurrentNum, maxValue: studyInfo.participantNum},
-        status: !studyInfo.status,
-        description: studyInfo.description,
-        creator: studyInfo.creator.firstName + ' ' + studyInfo.creator.lastName,
-        researcherList: studyInfo.researcherList,
-        studyType: studyInfo.studyType,
-        recruitmentStartDate: studyInfo.recruitmentStartDate,
-        recruitmentCloseDate: studyInfo.recruitmentCloseDate,
-        location: studyInfo.location,
-        driveLink: studyInfo.driveLink,
-        createdAt: studyInfo.createdAt,
-        updatedAt: studyInfo.updatedAt,
-        surveyLink: studyInfo.surveyLink
-    }));
 
+
+    function getStudyList  (data) {
+
+        const parseData = (data || []).map((studyInfo, index) => ({
+            id: index + 1,
+            studyId: studyInfo.studyId,
+            studyCode: studyInfo.studyCode,
+            name: studyInfo.studyName,
+            participantProgress: { value: studyInfo.participantCurrentNum, maxValue: studyInfo.participantNum},
+            status: !studyInfo.status,
+            // description: studyInfo.description,
+            // creator: studyInfo.creator.firstName + ' ' + studyInfo.creator.lastName,
+            // researcherList: studyInfo.researcherList,
+            // studyType: studyInfo.studyType,
+            // recruitmentStartDate: studyInfo.recruitmentStartDate,
+            recruitmentCloseDate: studyInfo.recruitmentCloseDate,
+            // location: studyInfo.location,
+            // driveLink: studyInfo.driveLink,
+            // createdAt: studyInfo.createdAt,
+            // updatedAt: studyInfo.updatedAt,
+            // surveyLink: studyInfo.surveyLink
+        }))
+
+        return parseData;
+    }
 
 
 
@@ -118,8 +151,6 @@ export default function ResearcherDashboardPage() {
                 >
                     {params.row.name}
                 </div>
-
-
 
             ),
             width: 200,
@@ -171,24 +202,46 @@ export default function ResearcherDashboardPage() {
 
 
 
-
+    const buttonText = isAlternateRows ? 'All Study' : 'Expired Study';
 
     return (
 
         <div>    
             <Navbar/> 
             <CssBaseline />
-        <div style={{marginLeft:'5%', marginRight: '5%', marginTop: '6.5%'}}>
-            <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '7%'}}>
-                <Button sx={{
-                    marginRight: '-7%',
-                    fontSize: '16px',
-                }} disableElevation
-                        variant="contained"
-                        aria-label="Disabled elevation buttons"
-                        onClick={handleCreateStudy}
+        <div style={{marginLeft:'5%', marginRight: '5%'}}>
 
-                >Create Study</Button>
+            <Box component="main" marginTop='6%' marginLeft={5} marginRight={0}>
+                <Box sx={{ display: 'flex', justifyContent: "flex-end", flexDirection: 'row', alignItems: 'center' }}>
+                    {expiredStudyList.length !== 0 &&
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <WarningAmberOutlinedIcon />
+                            <div style={{ margin: '0 3px' }}></div>
+                            <Typography variant="contained"> You have expired {expiredStudyList.length} studies.</Typography>
+                        </div>
+                         }
+
+
+                        <div style={{ margin: '0 20px' }}></div>
+
+                    {expiredStudyList.length !== 0 &&
+                        <Button variant="contained" sx={{
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                padding: '10px',
+                                lineHeight: 'normal',
+                            }} onClick={toggleRows}>{buttonText}</Button> }
+
+
+                        <div style={{ margin: '0 30px' }}></div>
+
+                        <Button variant="contained" sx={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            padding: '10px',
+                            lineHeight: 'normal',
+                        }} onClick={handleCreateStudy}>Create Study</Button>
+                    </Box>
             </Box>
 
             <div style={{ height: '100vh'}}>
@@ -203,7 +256,7 @@ export default function ResearcherDashboardPage() {
                     '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
                     '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
                 }}
-                rows={rows}
+                rows={currentRows}
                 columns={columns}
                 initialState={{
                     pagination: {

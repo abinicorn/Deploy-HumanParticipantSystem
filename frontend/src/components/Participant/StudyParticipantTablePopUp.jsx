@@ -17,7 +17,7 @@ export default function StudyParticipantTable({open, onClose}) {
 
             <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl" fullScreen>
                 <DialogContent style={{ height: '90vh', width: '99vw' }}>
-                    <Box  class= 'participant-Table-Pop-Up'>
+                    <Box class= 'participant-Table-Pop-Up'>
                         <ParticipantsTable />
                     </Box>
                 </DialogContent>

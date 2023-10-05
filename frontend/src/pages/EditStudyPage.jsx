@@ -3,6 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useGet from '../hooks/useGet';
 import EditStudyTemplate from '../components/Study/EditStudyTemplate';
 import {request} from "../utils/request";
+import ResearcherManagePopup from '../components/Researcher/ResearcherManagePopup';
+import { Container, Typography } from '@mui/material';
+import { useCurrentUser } from '../hooks/useCurrentUser';
+import { StudyResearcherContext } from '../providers/StudyResearcherContextProvider';
 
 
 export default function EditStudyPage() {
@@ -10,6 +14,9 @@ export default function EditStudyPage() {
     // const researcherId = '64fe98fdae1ff28bdcd455a7';
     const navigate = useNavigate("/");
 
+    const {user}= useCurrentUser();
+
+    const {refreshStudyDetailContext} = React.useContext(StudyResearcherContext);
 
     const { data, isLoading, refresh } = useGet(`/study/${studyId}`, []);
     const [studyData, setStudyData] = useState({
@@ -19,6 +26,8 @@ export default function EditStudyPage() {
         creator: '',
         researcherList: [],
         studyType: '',
+        isAnonymous: '',
+        anonymousParticipantNum:'',
         participantNum: '',
         recruitmentStartDate: '',
         recruitmentCloseDate: '',
@@ -35,6 +44,8 @@ export default function EditStudyPage() {
             creator: data.creator,
             researcherList: data.researcherList,
             studyType: data.studyType ?? "",
+            isAnonymous: data.isAnonymous ?? "",
+            anonymousParticipantNum: data.anonymousParticipantNum ?? "",
             participantNum: data.participantNum ?? "",
             recruitmentStartDate: data.recruitmentStartDate?.split("T")[0] ?? "",
             recruitmentCloseDate: data.recruitmentCloseDate?.split("T")[0] ?? "",
@@ -44,13 +55,16 @@ export default function EditStudyPage() {
         })
     }, [data])
 
+
     const handleSubmit = (event) => {
         event.preventDefault();
         editStudy(studyData)
             .then((res) => {
                 alert("Successfully edited study");
+                refreshStudyDetailContext();
                 refresh();
                 // navigate(`/studyInfo/${studyId}`);
+
             })
         
     };
@@ -66,13 +80,37 @@ export default function EditStudyPage() {
     }
 
     return (
-        isLoading ? <div>Loading</div> :
-            <EditStudyTemplate
-                isEditMode={true}
-                studyData={studyData}
-                setStudyData={setStudyData}
-                handleSubmit={handleSubmit}
-            />
+        isLoading ? <div>Loading...</div> :
+
+        <>
+            <Container>
+                <div style={{ paddingTop: '40px' }}>
+                    <Typography variant="h4" component="h1" color="grey" gutterBottom>
+                        Study Details
+                    </Typography>
+                    {studyData.creator === user.userId ? 
+                        (<div className='align-right'>
+                            <ResearcherManagePopup />
+                        </div>) : null}
+
+                </div>
+                <EditStudyTemplate
+                    isEditMode={false}
+                    studyData={studyData}
+                    setStudyData={setStudyData}
+                    handleSubmit={handleSubmit}
+                />
+            </Container>
+        </>
+            // <>
+
+            // <EditStudyTemplate
+            //     isEditMode={true}
+            //     studyData={studyData}
+            //     setStudyData={setStudyData}
+            //     handleSubmit={handleSubmit}
+            // />
+            // </>
     );
 
 

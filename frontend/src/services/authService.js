@@ -5,6 +5,7 @@ import {request} from "../utils/request";
 
 const baseUrl = process.env.REACT_APP_API_BASE_URL
 
+
 export const authService = {
     singIn: async (username, password) => {
             const rawData = await fetchLogin(username, password);

@@ -4,6 +4,7 @@ import EditStudyTemplate from '../components/Study/EditStudyTemplate';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import {request} from "../utils/request";
 import Navbar from '../components/Navbar';
+import { Container, Typography } from '@mui/material';
 
 export default function CreateStudyPage() {
 
@@ -19,6 +20,8 @@ export default function CreateStudyPage() {
         creator: researcherId,
         researcherList: [researcherId],
         studyType: '',
+        isAnonymous: '',
+        anonymousParticipantNum:'',
         participantNum: '',
         recruitmentStartDate: '',
         recruitmentCloseDate: '',
@@ -58,12 +61,19 @@ export default function CreateStudyPage() {
     return (
         <>
         <Navbar/>
-        <EditStudyTemplate
-            isEditMode={false}
-            studyData={studyData}
-            setStudyData={setStudyData}
-            handleSubmit={handleSubmit}
-        />
+            <Container>
+                <div style={{ paddingTop: '80px' }}>
+                    <Typography variant="h4" component="h1" color="grey" gutterBottom>
+                        Study Details
+                    </Typography>
+                </div>
+                <EditStudyTemplate
+                    isEditMode={false}
+                    studyData={studyData}
+                    setStudyData={setStudyData}
+                    handleSubmit={handleSubmit}
+                />
+            </Container>
         </>
     );
 

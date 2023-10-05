@@ -11,11 +11,14 @@ import { StudyResearcherContext } from '../providers/StudyResearcherContextProvi
 
 export default function ParticipantManagePage() {
     const { studyInfo } = useContext(StudyResearcherContext);
-    const { setIsAnonymous, selectedRows, setSelectedRows, studyParticipants} = useContext(StudyParticipantContext);
+    const {isAnonymous, setIsAnonymous, selectedRows, setSelectedRows, studyParticipants} = useContext(StudyParticipantContext);
     const {inputEmails, setInputEmails} = useContext(DataGridContext);
 
 
-    setIsAnonymous(studyInfo.studyType === "online-survey");
+    useEffect(() => {
+        setIsAnonymous(studyInfo.isAnonymous);
+    }, [studyInfo.isAnonymous]);
+    
 
     return (
         <div style={{maxWidth: '100vw'}}>
@@ -31,6 +34,7 @@ export default function ParticipantManagePage() {
                         </Box>
                     </Box>
                     <h1>{studyInfo.studyName} (Study Code: {studyInfo.studyCode})</h1>
+                    {isAnonymous && <h2>Anonymous Participants Number: {studyInfo.anonymousParticipantNum}</h2>}
                 </Box>
                 <Box marginLeft={5} marginRight={5} marginBottom={10} sx={{height: '65vh'}}>
                         <EmailInputComponent 

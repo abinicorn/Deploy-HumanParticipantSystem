@@ -54,7 +54,7 @@ export default function GiftList({ type, open, onClose }) {
         } finally {
             setLoading(false);
         }
-
+        
     };
 
     const getTitle = () => {

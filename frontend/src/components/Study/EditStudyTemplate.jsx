@@ -8,8 +8,11 @@ import {
     Button,
     Grid,
     FormLabel,
+    FormControlLabel,
     Chip,
     Stack,
+    Radio,
+    RadioGroup,
 } from '@mui/material';
 import Navbar from '../Navbar';
 import CreateIcon from '@mui/icons-material/Create';
@@ -23,6 +26,7 @@ import OptionPopup from '../Popup/OptionPopup';
 
 export default function EditStudyTemplate({ isEditMode, studyData, setStudyData, handleSubmit }) {
     const [locationInput, setLocationInput] = useState('');
+
 
     const navigate = useNavigate();
     
@@ -49,6 +53,13 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
         setStudyData({ ...studyData, location: newLocations });
     };
 
+    const handleAnonymousChange = (event) => {
+        const isAnonymous = event.target.value === "true";
+        setStudyData({
+            ...studyData,
+            isAnonymous: isAnonymous
+        });
+    };
 
     const handleClose = () => {
         alert('Study not saved!');
@@ -56,15 +67,20 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
 
     }
 
+ 
+    
+
     return (
         <div>
-            <div style={{ paddingTop: '64px' }}>
-                <Container>
+            <div 
+            // style={{ paddingTop: '64px' }}
+            >
+                {/* <Container> */}
                     {/* maxWidth="sm" */}
                     <form onSubmit={handleSubmit}>
-                    <Typography variant="h4" component="h1" color="grey" gutterBottom>
+                    {/* <Typography variant="h4" component="h1" color="grey" gutterBottom>
                     Study Details
-                </Typography>
+                </Typography> */}
                         <Grid container spacing={2}>
 
                         <Grid item xs={12}>
@@ -109,6 +125,35 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                     <MenuItem value="questionnaire"> <ContactPageIcon style={{ minWidth: '40px' }} /> Questionnaire</MenuItem>
                                 </Select>
                             </Grid>
+
+
+                            <Grid item xs={12}>
+                                <FormLabel id="demo-radio-buttons-group-label">Is Your Study Anonymous? </FormLabel>
+                                    <RadioGroup
+                                        aria-labelledby="demo-radio-buttons-group-label"
+                                        defaultValue="false"
+                                        name="isAnonymous"
+                                        value={studyData.isAnonymous? "true" : "false"}
+                                        onChange={handleAnonymousChange}
+                                    >
+                                        <FormControlLabel value="true" control={<Radio />} label="Yes" />
+                                        <FormControlLabel value="false" control={<Radio />} label="No" />
+                                    </RadioGroup>
+                            </Grid>
+
+                            {studyData.isAnonymous && (
+                            <Grid item xs={6}>
+                                <FormLabel>Number of anonymous participants you currently have:</FormLabel>
+                                <TextField
+                                    fullWidth
+                                    name="anonymousParticipantNum"
+                                    value={studyData.anonymousParticipantNum}
+                                    onChange={handleInputChange}
+                                    margin="dense"
+                                    type="number" // to ensure users enter only numeric values
+                                />
+                            </Grid>
+                            )}
 
                             <Grid item xs={12}>
                                 <FormLabel>Description: </FormLabel>
@@ -179,7 +224,7 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                 <Button variant="outlined" onClick={addLocation}>Add new location</Button>
                             </Grid>
                             <Grid item xs={6}>
-                                <FormLabel>Number of Participants</FormLabel>
+                                <FormLabel>Expected Number of Participants</FormLabel>
                                 <TextField
                                     fullWidth
                                     label="Number"
@@ -188,6 +233,8 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                     onChange={handleInputChange}
                                     required
                                     margin="dense"
+                                    type="number"
+                                    
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -230,7 +277,7 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                             </Grid>
                         </Grid>
                     </form>
-                </Container>
+                {/* </Container> */}
             </div>
         </div>
     );

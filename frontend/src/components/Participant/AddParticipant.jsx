@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions, 
     Button, TextField, FormControlLabel, 
-    Grid, List, ListItem, ListItemText, Typography
+    Grid, List, ListItem, ListItemText, Typography, Box
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
@@ -13,6 +13,7 @@ import ConfirmPopup from '../Popup/ConfirmPopup';
 import OptionPopup from '../Popup/OptionPopup';
 // import usePost from '../../hooks/usePost';
 // import useGet from '../../hooks/useGet'
+import GetAppIcon from '@mui/icons-material/GetApp';
 
 import { StudyParticipantContext } from '../../providers/StudyPaticipantsProvider';
 
@@ -38,7 +39,7 @@ export default function AddParticipant({ study_id }) {
     const [phoneNumError, setPhoneNumError] = useState('');
 
     const checkValidateEmails = async () => {
-        if (!firstName && ! lastName && !email && !phoneNum && files.length == 0) {
+        if (!firstName && ! lastName && !email && !phoneNum && files.length === 0) {
             setEmailError('Input an email or upload a csv file');
             return false;
         }
@@ -165,7 +166,7 @@ export default function AddParticipant({ study_id }) {
             };
         }
 
-        if  (files.length == 0) {
+        if  (files.length === 0) {
             return { participants: [manualParticipant] };
         }
 
@@ -300,9 +301,22 @@ export default function AddParticipant({ study_id }) {
                         }
                         label="This participant is willing to join in the future studies."
                     />
-                    <Typography variant="h6" style={{ marginTop: '20px' }}>
-                        Uploaded Files:
-                    </Typography>
+                    <Box marginTop='20px' sx={{display:'flex', justifyContent: "flex-start", flexDirection: 'row', alignItems: 'center' }}>
+                        <Typography variant="h6" style={{ marginRight: '20px' }}>
+                            Uploaded Files:
+                        </Typography>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                startIcon={<GetAppIcon />}
+                                component="a"
+                                href={!isAnonymous ? "/example-nonanonymous.csv" : "/example-anonymous.csv"}
+                                download
+                            >
+                                Download Example CSV File
+                            </Button>
+                        </Box>
                     <List>
                         {files.map((file, index) => (
                             <ListItem key={index}>
@@ -325,7 +339,7 @@ export default function AddParticipant({ study_id }) {
                         ))}
                     </List>
                     <Grid container direction="column" alignItems="center" style={{ marginTop: '20px'}}>
-                        <Typography variant="body2" color="error" style={{ marginBottom: '5px' }}>
+                        <Typography variant="body2" color="error" style={{ marginBottom: '10px' }}>
                             Please ensure the CSV file contains at least an "Email" column.
                         </Typography>
                         <Button

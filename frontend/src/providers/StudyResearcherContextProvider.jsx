@@ -59,6 +59,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
             const researcherResponse = await request.post(`/study/addResearcher/${studyIdToUse}`, newResearcher)
             console.log(researcherResponse);
             refreshResearcherContext();
+            refreshStudyDetailContext();
             return researcherResponse.data;
         } catch (error) {
             alert(error.response.data.message || "Error adding researcher");
@@ -69,6 +70,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         try {
             const response = await request.put(`/study/removeResearcher/${studyIdToUse}/${researcherId}`);
             refreshResearcherContext();
+            refreshStudyDetailContext();
             return response.data;
         } catch (error) {
             alert(error.response.data.message || "Error removing researcher)");

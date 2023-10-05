@@ -129,9 +129,9 @@ export default function StudyParticipantActionBtn({ context, selectedRows }) {
           Show Mailing List
         </MenuItem>
         {studyParticipants.length > 0 && [
-            <Divider sx={{ my: 0.5 }} />,
-            <MenuItem onClick={() => {setSelectRowsByEmails(!selectRowsByEmails)}}>
-            <CheckIcon style={{ visibility: selectRowsByEmails ? 'visible' : 'hidden' }}/>
+            <Divider key="divider-key" sx={{ my: 0.5 }} />,
+            <MenuItem key="menu-key" onClick={() => {setSelectRowsByEmails(!selectRowsByEmails)}}>
+            <CheckIcon key="icon-key" style={{ visibility: selectRowsByEmails ? 'visible' : 'hidden' }}/>
             Select Rows by Emails
             </MenuItem>
         ]}

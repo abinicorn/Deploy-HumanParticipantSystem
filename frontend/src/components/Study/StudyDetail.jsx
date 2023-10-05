@@ -22,7 +22,6 @@ export default function StudyDetail({data, isClosed}){
 
     const handleCloseStudy = async () => {
         try {
-            console.log(studyData.studyId);
             await request.put(`/study/${studyData.studyId}`, {isClosed: true});
             alert("Study closed successfully");
 
@@ -38,6 +37,17 @@ export default function StudyDetail({data, isClosed}){
         }
 
     };
+
+    const handleAnonymousParticipants = async () => {
+        try {
+            await request.delete(`/participant/anonymize-participants/${studyData.studyId}`);
+            alert("Study anonymous successfully");
+
+
+        } catch (error) {
+            alert(error || "Error anonymous study");
+        }
+    }
 
 
 
@@ -93,7 +103,7 @@ export default function StudyDetail({data, isClosed}){
 
         fetchData();
 
-    }, [studyData]);
+    }, [studyData, handleAnonymousParticipants]);
 
 
 
@@ -134,7 +144,9 @@ export default function StudyDetail({data, isClosed}){
             description: studyData.description,
             experimentType: studyData.studyType,
             date: parseData(studyData.createdAt),
-            location: studyData.location.join('; ')
+            location: studyData.location.join('; '),
+            isAnonvmous: studyData.isAnonvmous,
+            anonymousParticipantNum: studyData.anonymousParticipantNum
         }
 
         const sessionInfo = (sessionList || []).map((sessionInfo, index) => ({
@@ -181,23 +193,32 @@ export default function StudyDetail({data, isClosed}){
 
 
 
-        <Grid container spacing={2} alignItems="center" justifyContent="flex-start" 
-        // style={{ maxWidth: '100%' }}
-        >
+        <Grid container spacing={2} alignItems="center" justifyContent="flex-start" style={{ maxWidth: '100%' }}>
+
+
             <Grid item xs={12} align="right">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginRight: '10px', width:'23vw' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: '23vw' }}>
                     {!studyData.isClosed ? (
                         <OptionPopup
                             buttonText={"Close Study"}
                             onClick={handleCloseStudy}
                             popupText={'Are you sure you want to close this study?'}
                         />
-                    ) : null}
+                    ) :
+                        <OptionPopup
+                            buttonText={"Clear Participants Info"}
+                            onClick={handleAnonymousParticipants}
+                            popupText={'Are you sure you want to clear participants private info in this study?'}
+                        />
 
+                    }
+
+                    <div style={{ margin: '0 30px' }}></div>
 
                     <Button variant="contained" onClick={exportData}>Export JSON</Button>
                 </div>
             </Grid>
+
 
 
             <Grid item xs={12} align="center">
@@ -240,6 +261,20 @@ export default function StudyDetail({data, isClosed}){
 
                                 <span style={{ textDecoration: 'underline' }}>
                                   {studyData.studyType}
+                                </span>
+                            </span>
+                </Typography>
+            </Grid>
+
+
+            <Grid item xs={12} align="h5">
+                <Typography variant="h5" style={{ marginBottom: '10px', display: 'flex'}}>
+                            <span>
+                                <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Anonymous:</span>
+                                &nbsp; &nbsp; &nbsp;
+
+                                <span style={{ textDecoration: 'underline' }}>
+                                  {studyData.isAnonymous ? 'Yes' : 'No'}
                                 </span>
                             </span>
                 </Typography>
@@ -310,24 +345,8 @@ export default function StudyDetail({data, isClosed}){
                 </Typography>
             </Grid>
 
-            {/*<Grid item xs={12} align="left">*/}
-            {/*    <Typography variant="h5" style={{ marginBottom: '10px' }}>*/}
-            {/*        <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Status:</span>*/}
-            {/*        &nbsp; &nbsp; &nbsp;*/}
 
-            {/*        <span style={{ textDecoration: 'underline' }}>*/}
-            {/*                    {studyData.isClosed ? 'Close' : 'Active'}*/}
-            {/*                    </span>*/}
-            {/*    </Typography>*/}
 
-            {/*    {!studyData.isClosed ? (*/}
-            {/*        <OptionPopup*/}
-            {/*            buttonText={"Close Study"}*/}
-            {/*            onClick={handleCloseStudy}*/}
-            {/*            popupText={'Are you sure you want to close this study?'}*/}
-            {/*        />*/}
-            {/*    ) : null}*/}
-            {/*</Grid>*/}
 
             <Grid item xs={12} align="left" style={{ display: 'flex', alignItems: 'center' }}>
                 <Typography variant="h5" style={{ marginBottom: '10px' }}>
@@ -341,16 +360,7 @@ export default function StudyDetail({data, isClosed}){
                 </Typography>
             </Grid>
 
-            {/*<Grid item xs={12} align="right">*/}
-            {/*    {!studyData.isClosed ? (*/}
-            {/*        <OptionPopup*/}
-            {/*            buttonText={"Close Study"}*/}
-            {/*            onClick={handleCloseStudy}*/}
-            {/*            popupText={'Are you sure you want to close this study?'}*/}
-            {/*        />*/}
-            {/*    ) : null}*/}
 
-            {/*</Grid>*/}
 
 
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '50px', width: '100%' }}>

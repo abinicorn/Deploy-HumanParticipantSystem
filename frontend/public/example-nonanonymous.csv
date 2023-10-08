@@ -1,0 +1,3 @@
+FirstName,LastName,Email,PhoneNum,IsWillContact
+John,Doen,john.doen@example.com,123456,TRUE
+Jane,Smithing,jane.smithing@example.com,321456,FALSE

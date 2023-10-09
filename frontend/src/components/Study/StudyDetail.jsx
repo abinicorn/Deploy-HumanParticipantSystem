@@ -40,9 +40,15 @@ export default function StudyDetail({data, isClosed}){
 
     const handleAnonymousParticipants = async () => {
         try {
-            await request.delete(`/participant/anonymize-participants/${studyData.studyId}`);
-            alert("Study anonymous successfully");
-
+            const response= await request.delete(`/participant/anonymize-participants/${studyData.studyId}`);
+            if(response.status === 200){
+                alert("Study anonymous successfully");
+            }else if(response.status === 204){
+                alert("No Participants need to be anonymous, as they are currently in other studies or willing to be contacted in the future");
+            }
+            else{
+                alert("Study anonymous failed");
+            }
 
         } catch (error) {
             alert(error || "Error anonymous study");

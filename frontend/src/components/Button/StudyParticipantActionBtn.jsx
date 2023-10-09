@@ -89,8 +89,20 @@ export default function StudyParticipantActionBtn({ context, selectedRows }) {
 
   const handleOpenTablePopUp = () => {
     setOpenTablePopUp(true);
+    openFullscreen(document.documentElement);
     handleClose();
   }
+
+  function openFullscreen(element) {
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if (element.webkitRequestFullscreen) { /* Safari */
+      element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) { /* IE11 */
+      element.msRequestFullscreen();
+    }
+  }
+
 
   return (
     <div>

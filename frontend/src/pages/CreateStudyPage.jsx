@@ -20,7 +20,7 @@ export default function CreateStudyPage() {
         creator: researcherId,
         researcherList: [researcherId],
         studyType: '',
-        isAnonymous: '',
+        isAnonymous: false,
         anonymousParticipantNum:'',
         participantNum: '',
         recruitmentStartDate: '',

@@ -1,9 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { Dialog, DialogTitle, DialogContent,TextField, Button, Typography, Box, Switch, DialogActions } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Button, Typography, Box, DialogActions } from '@mui/material';
 import CustomCheckbox from '../Button/CustomCheckbox';
-import CloseCircleButton from '../Button/CloseCircleButton';
-import DescriptionIcon from '@mui/icons-material/Description';
-import RedeemIcon from '@mui/icons-material/Redeem';
 import '../../styles/GiftList.css';
 import MailingList from './MailingList';
 import { StudyResearcherContext } from '../../providers/StudyResearcherContextProvider';
@@ -14,8 +11,10 @@ import { combineCodeSerialNum } from '../../utils/combineCodeSerialNum';
 import EmailInputComponent from '../DataGrid/EmailInputComponent';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
+//Define the gift list component to display the gift list or report the recipient list according to the type
 export default function GiftList({ type, open, onClose }) {
-    // const [open, setOpen] = useState(open);
+
+    //Define state and context variables
     const [selectedRows, setSelectedRows] = useState([]);
     const [inputEmails, setInputEmails] = useState('');
     const {studyParticipants, updateSentStatus, toggleStudyParticipantsProperty} = useContext(StudyParticipantContext);
@@ -23,18 +22,17 @@ export default function GiftList({ type, open, onClose }) {
     const [openMailingList, setOpenMailingList] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    // const handleClose = () => {
-    //     setOpen(false);
-    //     if (onClose) onClose(); 
-    //   };
+    // Handle the open mailing list dialog box
     const handleOpenMailingList = () => {
         setOpenMailingList(true);
     };
 
+    // Handle the close mailing list dialog box
     const handleCloseMailingList = () => {
         setOpenMailingList(false);
     };
 
+    // Toggle the sending status of the selected participant
     const handleToggleSentStatus = async (_id) => {
         setLoading(true);
         const participantToUpdate = studyParticipants.find(p => p._id === _id);
@@ -57,18 +55,22 @@ export default function GiftList({ type, open, onClose }) {
         
     };
 
+    // Get the title of the dialog box
     const getTitle = () => {
         return type === 'gift' ? 'Gift List' : 'Report Recipients List';
     }
 
+    // Determine if participants should be included
     const shouldIncludeParticipant = (participant) => {
         return type === 'gift' ? participant.isGift : participant.isWIllReceiveReport;
     }
 
+    // Get the status of the checkbox
     const getCheckboxState = (participant) => {
         return type === 'gift' ? participant.isSentGift : participant.isSentReport;
     }
 
+    //toggle selected rows
     const handleToggleSelectedRows = () => {
         const dataToSend = {
             ids: selectedRows,
@@ -78,6 +80,7 @@ export default function GiftList({ type, open, onClose }) {
         updateSelectedStudyParticipants(dataToSend);
     };
 
+    // Update selected study participants
     async function updateSelectedStudyParticipants(data) {
         setLoading(true);
         try {
@@ -89,6 +92,7 @@ export default function GiftList({ type, open, onClose }) {
         }
     }
 
+    // Reorder rows based on selection
     const reorderRowsBasedOnSelection = (rows, selectedRows) => {
         return [...rows].sort((a, b) => {
           const aIsSelected = selectedRows.includes(a._id);
@@ -161,19 +165,9 @@ export default function GiftList({ type, open, onClose }) {
             status: getCheckboxState(participant),
         };
     });
-    
 
     return (
         <div>
-            {/* <Button 
-                variant="contained" 
-                color="primary" 
-                onClick={() => setOpen(true)}
-                startIcon={type === 'gift' ? <RedeemIcon /> : <DescriptionIcon />}
-            >
-                {type === 'gift' ? 'Show Gift List' : 'Show Report Recipients'}
-            </Button> */}
-            {/* <Typography textAlign="center">{type === 'gift' ? 'Show Gift List' : 'Show Report Recipients'}</Typography> */}
 
             <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
                 <Box marginLeft={8} marginRight={8}>
@@ -192,7 +186,14 @@ export default function GiftList({ type, open, onClose }) {
                         }
                         <Box height='35px'>
                             {selectedRows.length > 0 && 
-                                <button onClick={handleToggleSelectedRows}>Toggle Selected Rows</button>
+                                <Button style={{ 
+                                            maxHeight: '20px',
+                                            minWidth: '30px',
+                                            fontSize: '10px',
+                                        }} 
+                                        variant="outlined" 
+                                        onClick={handleToggleSelectedRows}
+                                >Toggle Selected Rows</Button>
                             }
                         </Box>
                         <Box height="60vh">

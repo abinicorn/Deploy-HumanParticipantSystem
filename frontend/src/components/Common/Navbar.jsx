@@ -1,3 +1,4 @@
+import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -7,10 +8,9 @@ import Menu from '@mui/material/Menu';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import HomeIcon from '../assets/The University of Auckland.png';
-import { useState } from 'react';
+import HomeIcon from '../../assets/The University of Auckland.png';
 import { useNavigate } from 'react-router-dom';
-import {authService} from "../services/authService";
+import {authService} from "../../services/authService";
 
 
 export default function Navbar() {
@@ -19,7 +19,7 @@ export default function Navbar() {
     
     const settings = ['Profile', 'Logout'];
 
-    const [anchorElUser, setAnchorElUser] = useState(null);
+    const [anchorElUser, setAnchorElUser] = React.useState(null);
     
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
@@ -87,7 +87,7 @@ export default function Navbar() {
                         >
                         {settings.map((setting) => (
                             <MenuItem key={setting} onClick={() => handleSettingClick(setting)}>
-                            <Typography textAlign="center">{setting}</Typography>
+                            {setting}
                             </MenuItem>
                         ))}
                         </Menu>

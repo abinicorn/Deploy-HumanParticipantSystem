@@ -71,6 +71,7 @@ export default function SessionArchive() {
                         }}
                         disableSelectionOnClick
                         hideFooterSelectedRowCount
+                        disableVirtualization
                     />
                 </DialogContent>
                 <DialogActions>

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useGridApiContext, useGridSelector, gridPageCountSelector, GridPagination } from '@mui/x-data-grid';
 import MuiPagination from '@mui/material/Pagination';
+import {Button} from '@mui/material';
 
 function Pagination(props) {
     const apiRef = useGridApiContext();
     const pageCount = useGridSelector(apiRef, gridPageCountSelector);
   
-    const [pageInput, setPageInput] = useState('');  // 用于存储用户输入的页码
+    const [pageInput, setPageInput] = useState('');  // Used to store page numbers entered by the user
   
     const handlePageInputChange = (e) => {
       setPageInput(e.target.value);
@@ -39,9 +40,17 @@ function Pagination(props) {
           value={pageInput}
           onChange={handlePageInputChange}
           style={{ marginLeft: '10px', width: '50px' }}
-          placeholder="Go to"
+          placeholder="Go"
         />
-        <button onClick={handleGoButtonClick} style={{ marginLeft: '5px' }}>Go</button>
+        <Button 
+          onClick={handleGoButtonClick} 
+          variant="contained"
+          style={{ 
+            marginLeft: '5px',
+            maxHeight: '20px',
+            minWidth: '30px',
+            fontSize: '10px',
+          }}>Go</Button>
       </div>
     );
   }

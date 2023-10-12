@@ -93,6 +93,7 @@ export default function StudyParticipantActionBtn({ context, selectedRows }) {
     handleClose();
   }
 
+  // open fullscreen set up
   function openFullscreen(element) {
     if (element.requestFullscreen) {
       element.requestFullscreen();
@@ -102,7 +103,6 @@ export default function StudyParticipantActionBtn({ context, selectedRows }) {
       element.msRequestFullscreen();
     }
   }
-
 
   return (
     <div>

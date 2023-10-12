@@ -1,7 +1,6 @@
 import React from 'react';
 import IconButton from '@mui/material/IconButton';
 import SvgIcon from '@mui/material/SvgIcon';
-import { Button, Dialog, DialogContent, DialogActions, DialogContentText } from '@mui/material';
 import OptionDialog from '../Popup/OptonDialog';
 
 export default function CloseCircleButton({ popupText, onClick, size = '48px' }) {
@@ -24,6 +23,7 @@ export default function CloseCircleButton({ popupText, onClick, size = '48px' })
     return (
         <div>
             <IconButton 
+                data-testid="close-button"
                 style={{
                     backgroundColor: 'red',
                     color: 'white',

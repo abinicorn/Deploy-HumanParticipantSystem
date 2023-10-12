@@ -15,6 +15,8 @@ export default function SessionParticipantList({ targetSessionId }) {
     const { studyParticipants } = React.useContext(StudyParticipantContext);
     const { sessions } = React.useContext(SessionContext);
     const targetSession = sessions.find(s => s._id === targetSessionId);
+    
+    // Reorganize the participant info for displaying purpose
     let participantInfo = []
     if (studyParticipants) {
         participantInfo = studyParticipants.reduce(

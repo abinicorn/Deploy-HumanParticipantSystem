@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {useCurrentUser} from "../hooks/useCurrentUser";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Common/Navbar";
 import {request} from "../utils/request";
 export default function ResearcherProfilePage() {
 
@@ -93,6 +93,8 @@ export default function ResearcherProfilePage() {
             });
 
     }
+
+    // Email is unique in database
     const checkEmailExist = async (email) => {
 
             const res = await request.get(`/researcher/email/${email}`);

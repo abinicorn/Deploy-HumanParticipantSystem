@@ -7,7 +7,7 @@ const UncheckedIcon = (props) => {
     const theme = useTheme();
 
     return (
-        <SvgIcon {...props}>
+        <SvgIcon {...props} data-testid="unchecked-icon">
             <circle cx="12" cy="12" r="11" stroke={theme.palette.primary.main} strokeWidth="2" fill="none" />
         </SvgIcon>
     );
@@ -17,7 +17,7 @@ const CheckedIcon = (props) => {
     const theme = useTheme();
 
     return (
-        <SvgIcon {...props}>
+        <SvgIcon {...props} data-testid="checked-icon">
             <circle cx="12" cy="12" r="11" stroke={theme.palette.primary.main} strokeWidth="2" fill="none" />
             <path d="M4 12l5 5L20 6" stroke="green" strokeWidth="3" fill="none" />
         </SvgIcon>

@@ -84,14 +84,17 @@ export default function CreateEditSession({create, targetSessionId}) {
     setChecked(not(checked, rightChecked));
   };
 
+  // Generate random number for session code  
   const generateRandomNum = (min, max) => {
     return Math.round(Math.random()*(max-min)+min)
   }
 
+  // Check if session code is duplicated
   const sessionCodeIsDuplicate = (code, list) => {
     return list.includes(code);
   }
 
+  // Generate unique session code
   const generateUniqueCode = () => {
     
     let randomNum; 
@@ -110,10 +113,12 @@ export default function CreateEditSession({create, targetSessionId}) {
 
   }
   
+  // Handle session input change
   const handleSessionChange = (e) => {
     setSessionContent({...sessionContent, [e.target.name]: e.target.value})
   }
 
+  // Handle click open the create new session
   const handleNewClickOpen = () => {
     setSessionContent({
       studyId: studyId,
@@ -133,6 +138,7 @@ export default function CreateEditSession({create, targetSessionId}) {
     setOpen(true);
   };
 
+  // Handel click open the edit session
   const handleEditClickOpen = () => {
     
     setSessionContent({
@@ -172,6 +178,7 @@ export default function CreateEditSession({create, targetSessionId}) {
     setOpen(false);
   };
 
+  // Handle create a new session after clicking the SAVE button
   const handleCreate = () => {
     
     if (!sessionContent.date|| !sessionContent.participantNum) {
@@ -194,6 +201,7 @@ export default function CreateEditSession({create, targetSessionId}) {
     return true //For ConfirmPopup
   };
 
+  // Handle update a session after clicking the SAVE button
   const handleUpdate = () => {
     let updatedParticipantInfo = []
     for (let index = 0; index < right.length; index++) {
@@ -211,6 +219,7 @@ export default function CreateEditSession({create, targetSessionId}) {
     //console.log(left)
   }, [right])
 
+  // Layout for the participant list
   const customList = (title, items) => (
     <Card>
       <CardHeader

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import EditStudyTemplate from '../components/Study/EditStudyTemplate';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import {request} from "../utils/request";
-import Navbar from '../components/Navbar';
+import Navbar from '../components/Common/Navbar';
 import { Container, Typography } from '@mui/material';
 
 export default function CreateStudyPage() {
@@ -28,7 +28,8 @@ export default function CreateStudyPage() {
         location: [],
         surveyLink: '',
         driveLink: '',
-        isClosed: false
+        isClosed: false,
+        isCleared: false
     });
 
     const handleSubmit = async (event) => {

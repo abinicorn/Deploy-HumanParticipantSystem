@@ -3,6 +3,7 @@ import {tokenService, TokenType} from "../services/tokenService";
 
 const baseUrl = process.env.REACT_APP_API_BASE_URL
 
+// Package request with token
 export const request = axios.create({
     baseURL: baseUrl,
     timeout: 15000,
@@ -49,7 +50,7 @@ request.interceptors.response.use(
         }
 
 
-        if (error.response && error.response.status === 402) {
+        if (error.response.status === 402) {
             alert("Token has expired, please log in again.");
             window.location.href = "/";
         }

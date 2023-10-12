@@ -7,7 +7,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { StudyResearcherContext } from '../../providers/StudyResearcherContextProvider';
-import ConfirmPopup from '../Popup/ConfirmPopup';
 import { checkEmailValidation } from '../../utils/checkEmailValidation';
 
 
@@ -71,6 +70,7 @@ export default function AddResearcherPopup() {
                 margin="dense"
                 id="firstName"
                 label="First Name"
+                inputProps={{ 'data-testid': 'First Name' }}
                 type="text"
                 fullWidth
                 variant="standard"
@@ -86,6 +86,7 @@ export default function AddResearcherPopup() {
                 margin="dense"
                 id="lastName"
                 label="Last Name"
+                inputProps={{ 'data-testid': 'Last Name' }}
                 type="text"
                 fullWidth
                 variant="standard"
@@ -101,6 +102,7 @@ export default function AddResearcherPopup() {
                 margin="dense"
                 id="emailAddress"
                 label="Email Address"
+                inputProps={{ 'data-testid': 'Email Address' }}
                 type="email"
                 fullWidth
                 variant="standard"

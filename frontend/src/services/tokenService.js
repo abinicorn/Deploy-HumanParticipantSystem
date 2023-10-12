@@ -4,6 +4,7 @@ export  const TokenType = {
     CURRENT_USERID: 'userId'
 }
 
+// Store token
 export const tokenService = {
     getToken: (tokenType) => {
         return localStorage.getItem(tokenType) ?? null;

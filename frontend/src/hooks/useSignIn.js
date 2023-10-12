@@ -3,15 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import {authService} from "../services/authService";
 
 export const useSignIn = () => {
-
+    // Sign in
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
     const navigate = useNavigate();
 
-    // const { callback } = useMemo(() => {
-    //     return parseQueryString(history?.location?.search ?? "");
-    // }, [navigate]);
 
     const onSignIn = useCallback(
         async (username, password) => {
@@ -39,7 +36,6 @@ export const useSignIn = () => {
             }
 
         },
-        // [callback]
         []
     );
 

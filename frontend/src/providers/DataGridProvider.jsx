@@ -1,10 +1,12 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState } from 'react';
 
 export const DataGridContext = createContext();
 
 export function DataGridProvider({ children }) {
-    const [selectRowsByEmails, setSelectRowsByEmails] = useState(false);
-    const [inputEmails, setInputEmails] = useState('');
+    const [selectRowsByEmails, setSelectRowsByEmails] = useState(false); // is user using the select rows by email function
+    const [inputEmails, setInputEmails] = useState(''); // inputed string
+
+    //datagrid models
     const [sortModel, setSortModel] = useState([]);
     const [filterModel, setFilterModel] = useState({ items: [] });
     const [pageModel, setPageModel] = useState({

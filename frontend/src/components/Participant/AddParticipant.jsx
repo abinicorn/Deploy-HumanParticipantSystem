@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions, 
     Button, TextField, FormControlLabel, 
@@ -11,8 +11,6 @@ import CustomCheckbox from '../Button/CustomCheckbox';
 import CloseCircleButton from '../Button/CloseCircleButton';
 import ConfirmPopup from '../Popup/ConfirmPopup';
 import OptionPopup from '../Popup/OptionPopup';
-// import usePost from '../../hooks/usePost';
-// import useGet from '../../hooks/useGet'
 import GetAppIcon from '@mui/icons-material/GetApp';
 
 import { StudyParticipantContext } from '../../providers/StudyPaticipantsProvider';
@@ -22,7 +20,7 @@ import { checkPhoneNumValidation } from '../../utils/checkPhoneNumValidation';
 
 import Papa from 'papaparse';
 
-export default function AddParticipant({ study_id }) {
+export default function AddParticipant() {
     const [open, setOpen] = useState(false);
     const [firstName, setFirstName] = useState(''); 
     const [lastName, setLastName] = useState('');
@@ -35,10 +33,12 @@ export default function AddParticipant({ study_id }) {
 
     const {addStudyParticipants, addParticipants, isAnonymous} = useContext(StudyParticipantContext);
 
-    const [emailError, setEmailError] = useState('');
-    const [phoneNumError, setPhoneNumError] = useState('');
+    const [emailError, setEmailError] = useState(''); // error msg
+    const [phoneNumError, setPhoneNumError] = useState(''); // error msg
 
+    // email validation check
     const checkValidateEmails = async () => {
+        // no email input
         if (!firstName && ! lastName && !email && !phoneNum && files.length === 0) {
             setEmailError('Input an email or upload a csv file');
             return false;
@@ -55,12 +55,14 @@ export default function AddParticipant({ study_id }) {
                 return false;
             }
 
+            // if input phone num, check validation
             if (phoneNum && !checkPhoneNumValidation(phoneNum)) {
                 setPhoneNumError('Invalid phone number format');
                 return false;
             }
         }
 
+        // if upload files
         if (files.length > 0) {
             const parsedData = await parseUploadedFiles();
             let hasError = false;
@@ -278,6 +280,7 @@ export default function AddParticipant({ study_id }) {
                         error={!!emailError}
                         helperText={emailError}
                         style={{ marginBottom: '20px', marginTop: '20px'}}
+                        required
                     />
                     { !isAnonymous && <TextField 
                         fullWidth 

@@ -12,8 +12,6 @@ const StudyResearcherContext = React.createContext({
 
 function StudyResearcherContextProvider({pageItemId, children}) {
 
-    // const {studyId} =useParams();
-
 
     // Get studyId from route params
     const { studyId: routeStudyId } = useParams();
@@ -53,7 +51,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
     }, [studyIdToUse]);
     
 
-    //to do
+    //To add a new researcher to the study
     async function addResearcher (newResearcher) { 
         try{
             const researcherResponse = await request.post(`/study/addResearcher/${studyIdToUse}`, newResearcher)
@@ -66,6 +64,21 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         }
     }
 
+
+    //To add existing researchers to the study
+    async function addExistingResearcher (studyIdToUse, researcherId) {  
+        try{
+            const researcherResponse = await request.put(`/study/associateResearcher/${studyIdToUse}/${researcherId}`);
+            refreshResearcherContext();
+            refreshStudyDetailContext();
+            return researcherResponse.data;
+        } catch (error) {
+            alert(error.response.data.message || "Error adding researcher");
+        }
+    }
+
+
+    //To remove a researcher from the study
     async function removeResearcher (studyId, researcherId) {
         try {
             const response = await request.put(`/study/removeResearcher/${studyIdToUse}/${researcherId}`);
@@ -77,7 +90,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         }
         }
 
-
+    //To get researcher by researcher email
     async function fetchResearcherbyEmail (email) {
         const response = await request.get(`/researcher/email/${email}`);
         return response;
@@ -94,6 +107,7 @@ function StudyResearcherContextProvider({pageItemId, children}) {
         allResearchersLoading,
         refreshAllResearchersContext,
         addResearcher,
+        addExistingResearcher,
         removeResearcher,
         fetchResearcherbyEmail,
         studyDetailInfo,

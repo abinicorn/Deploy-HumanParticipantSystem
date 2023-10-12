@@ -8,13 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 export default function ConfirmPopup({buttonText, popupText, onClick, onConfirm}) {
     const [open, setOpen] = React.useState(false);
-    
-    // const handleClickOpen = () => {
-    //     if (onClick) { // Ensure onClick is provided and is a function
-    //         onClick();
-    //     }
-    //     setOpen(true);
-    // };
+
     const handleClickOpen = async () => {
         let shouldOpen = true; // Default to true in case onClick is not provided
     

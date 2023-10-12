@@ -57,7 +57,11 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0"
   },
-  "jest":{
-    "testEnvironment": "jsdom"
-}
+  "jest": {
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "<rootDir>/__mocks__/styleMock.js",
+      "\\.(png|jpg|jpeg|gif|svg|ico)$": "<rootDir>/src/components/Common/__test__/imageMock.js"
+    }
+  }
 }

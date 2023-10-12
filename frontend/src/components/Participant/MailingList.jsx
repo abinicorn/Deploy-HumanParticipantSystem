@@ -1,40 +1,33 @@
-import React, { useState, useContext } from 'react';
+import React, {useContext } from 'react';
 import { Dialog, DialogTitle, DialogContent, Typography, Button, Box } from '@mui/material';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
 export default function MailingList({ context, selectedRows, open, onClose }) {
-    // const [open, setOpen] = useState(false);
-    // Convert the participants' emails into a comma-separated string
     const {studyParticipants} = useContext(context);
+
+    //The default message is that the mailing list is empty
     let emails = 'Mailing list is empty. Select participants to get their mailing list.'
-    // if (studyParticipants && studyParticipants.length > 0) {
-    //     emails = studyParticipants.map(sp => sp.participantInfo.email).join(', ');
-    // }
+
+    // If there are study participants and there is a selected row, build the mailing list
     if (studyParticipants && studyParticipants.length > 0 && selectedRows && selectedRows.length > 0) {
         // Filter out participants who are selected and map to their emails
-        emails = studyParticipants
+        // If the participant has an email field, use it
+        if (studyParticipants[0].email) {
+            emails = studyParticipants
+                    .filter(sp => selectedRows.includes(sp._id))  // Assuming _id is a unique identifier for each participant
+                    .map(sp => sp.email)
+                    .join(', ');
+        } else {
+            // Otherwise, use the email field from the participant information
+            emails = studyParticipants
                     .filter(sp => selectedRows.includes(sp._id))  // Assuming _id is a unique identifier for each participant
                     .map(sp => sp.participantInfo.email)
                     .join(', ');
+        }
+        
     }
-
-    // const handleOpen = () => {
-    //     setOpen(true);
-    // };
-
-    // const handleClose = () => {
-    //     setOpen(false);
-    //     if (onClose) onClose();
-    // };
 
     return (
         <div>
-            {/* This button will open the mailing list dialog */}
-            {/* <Button variant="contained" color="primary" onClick={handleOpen} startIcon={<MailOutlineIcon />}>
-                Show Mailing List
-            </Button> */}
-
-            {/* <Typography textAlign="center" onClick={handleOpen}>Show Mailing List</Typography> */}
 
             <Dialog open={open} onClose={onClose} fullWidth>
                 <DialogTitle align="center">

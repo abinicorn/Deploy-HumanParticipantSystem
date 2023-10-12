@@ -2,32 +2,21 @@ import {useState, useEffect, createContext} from 'react';
 import { useParams } from 'react-router-dom';
 import {request} from "../utils/request";
 
+// Create a context for Study Participants
 export const StudyParticipantContext = createContext(undefined);
 
 export default function StudyParticipantProvider({children}) {
-    const [studyParticipants, setStudyParticipants] = useState([]);
-    const [tags, setTags] = useState([]);
-    const [selectedRows, setSelectedRows] = useState([]);
-    const [isAnonymous, setIsAnonymous] = useState(false);
-    const [loading, setLoading] = useState(true);
+    // Various states for study participants, tags, and other related data
+    const [studyParticipants, setStudyParticipants] = useState([]); // all participants in this study
+    const [tags, setTags] = useState([]); // all tags in db
+    const [selectedRows, setSelectedRows] = useState([]); // datagrid selected rows
+    const [isAnonymous, setIsAnonymous] = useState(false); // is the study anonymous
+    const [loading, setLoading] = useState(true); // datagrid loading status
   
-        // const study_id = "64fef4f7b921a503b17be43c";// 5000 SP
-    // // const study_id ='64fed03dd49623d718f09a77' // 0 SP
-    // const studyId = "64fef4f7b921a503b17be43c";
+    // Extract studyId from the URL params
     const { studyId } = useParams();
 
-    // const {
-    //     data: studyparticipants,
-    //     isLoading: studyparticipantsLoading,
-    //     refresh: refreshStudyparticipants
-    // } = useGet(`/study-participants/${studyId}`, [])
-
-    // const {
-    //     data: studyParticipants,
-    //     isLoading: studyParticipantsLoading,
-    //     refresh: refreshStudyParticipants
-    // } = useGet(`/study-participants/${studyId}`, [])
-
+    // Fetch study participants and tags when studyId changes
     useEffect(() => {
         
         const fetchData = async () => {
@@ -39,6 +28,7 @@ export default function StudyParticipantProvider({children}) {
         
     }, [studyId]);
 
+    // Fetch all study participants for a given studyId
     async function fetchStudyParticipants() {
 
         setLoading(true);
@@ -51,17 +41,20 @@ export default function StudyParticipantProvider({children}) {
         setLoading(false);
     };
 
+    // Fetch all available tags
     async function fetchTags() {
         const response = await request.get(`/tag/all`);
         setTags(response.data);
     }
     
+    // Add new participants to the system
     async function addParticipants (newParticipants) {
         const participantsResponse = await request.post(`/participant/add`, newParticipants)
         return participantsResponse.data;
 
     }
 
+    // Add new study participants to a specific study
     async function addStudyParticipants (newStudyParticipants) {
         const response = await request.post(`/study-participants/${studyId}`, newStudyParticipants)
         fetchStudyParticipants();
@@ -69,6 +62,7 @@ export default function StudyParticipantProvider({children}) {
 
     }
 
+    // Update a specific study participant within the local state
     function updateSpecificStudyParticipant(updatedParticipant) {
         setStudyParticipants(prevParticipants => {
             return prevParticipants.map(participant => {
@@ -80,6 +74,7 @@ export default function StudyParticipantProvider({children}) {
         });
     }
 
+    // Toggle a boolean property for selected study participants
     async function toggleStudyParticipantsProperty(updateData) {
         try {
             setLoading(true);
@@ -110,6 +105,7 @@ export default function StudyParticipantProvider({children}) {
         }
     }
     
+    // Toggle a boolean property for participants (not study-specific)
     async function toggleParticipantsProperty(updateData) {
         try {
             setLoading(true);
@@ -139,47 +135,13 @@ export default function StudyParticipantProvider({children}) {
             setLoading(false);
         }
     }
-    
-    
-    // async function toggleStudyParticipantsProperty(updateData) {
-        
-    //     try {
-    //         const response = await request.put(`/study-participants/toggle-property`, updateData);
-    //         if (response.status === 200) {
-    //             console.log("Successfully toggled property for the selected participants.");
-    //             // You can update the local state or refetch the data if needed here.
-    //             fetchStudyParticipants();
-    //         }
-    //     } catch (error) {
-    //         console.error("Error toggling property for the selected participants:", error);
-    //     }
-    // }
 
-    // async function toggleParticipantsProperty(updateData) {
-        
-    //     try {
-    //         const response = await request.put(`/participant/toggle-property`, updateData);
-    //         if (response.status === 200) {
-    //             console.log("Successfully toggled property for the selected participants.");
-    //             // You can update the local state or refetch the data if needed here.
-    //             fetchStudyParticipants();
-    //         }
-    //     } catch (error) {
-    //         console.error("Error toggling property for the selected participants:", error);
-    //     }
-    // }
-    
-    // async function deleteSession (sessionId) {
-    //     const response = await axios.delete(`/session/${sessionId}`)
-    //     refreshSession();
-    //     return response
-    // }
-
+    // Handle final update for a study participant
     async function finalUpdateStudyParticipant(updatedStudyParticipant) {
         try {
             setLoading(true);
-            const studyParticipantResponse = await updateStudyParticipant(updatedStudyParticipant);
-            const participantResponse = await updateParticipant(updatedStudyParticipant.participantInfo);
+            await updateStudyParticipant(updatedStudyParticipant);
+            await updateParticipant(updatedStudyParticipant.participantInfo);
             updateSpecificStudyParticipant(updatedStudyParticipant);
             return true;
         } catch (error) {
@@ -194,6 +156,7 @@ export default function StudyParticipantProvider({children}) {
         }
     }
     
+    // Update the sent status for a study participant
     async function updateSentStatus (updatedStudyParticipant) {
         const response = await updateStudyParticipant(updatedStudyParticipant);
         console.log(response)
@@ -202,12 +165,14 @@ export default function StudyParticipantProvider({children}) {
         }
     }
 
+    // Update details of a specific study participant
     async function updateStudyParticipant (updatedStudyParticipant) {
         
         const response = await request.put(`/study-participants/${updatedStudyParticipant._id}`, updatedStudyParticipant);
         return response;
     }
 
+    // Update details of a participant
     async function updateParticipant (updatedParticipant) {
         const validatedParticipant = await validateAndUpdateTags(updatedParticipant);
         console.log(validatedParticipant);
@@ -215,6 +180,7 @@ export default function StudyParticipantProvider({children}) {
         return response.data;
     }
 
+    // Set a study participant's active status to false
     async function setStudyParticipantNotActive (studyParticipant) {
         setLoading(true);
         studyParticipant.isActive = false;
@@ -229,12 +195,14 @@ export default function StudyParticipantProvider({children}) {
         return response;
     }
 
+    // Add new tags to the system
     async function addTags (newTags) {
         console.log(newTags)
         const response = await request.post(`/tag/add`, newTags);
         return response.data.success;
     }
 
+    // Validate the tags of a participant and update as necessary
     async function validateAndUpdateTags(participant) {
         const validTags = tags.map(tag => tag.tagName);
         const tagsToAdd = [];
@@ -263,36 +231,37 @@ export default function StudyParticipantProvider({children}) {
         return participant;
     }
 
+    // Add a specific tag to selected participants
     async function handleAddTagToSelectedRows (newTagName) {
         setLoading(true);
-        // 检查新标签是否已存在于 tags 中
+        // Check if the new tag already exists in tags
         const tagExists = tags.some(tag => tag.tagName === newTagName);
         let newTagId = null;
         if (!tagExists) {
-            // 如果新标签不存在，则添加到 tags 中
+            // If the new tag does not exist, it is added to tags
             await addTags({ tags: [{tagName: newTagName}] }).then(addedTags => {
-                // 更新 tags 状态
+                // Update tags status
                 setTags(prevTags => [...prevTags, ...addedTags]);
-                // 获取新标签的 _id
+                // Get the _id of the new tag
                 newTagId = addedTags[0]?._id || null;
             });
         } else {
-            // 获取新标签的 _id
+            // Get the _id of the new tag
             newTagId = tags.find(tag => tag.tagName === newTagName)?._id || null;
         }
     
         const updateIds = [];
         const updatedParticipants = [];
 
-        // 遍历所有选中的参与者
+        // Iterate through all selected participants
         studyParticipants.filter(participant => selectedRows.includes(participant._id))
         .forEach(participant => {
-            // 检查新标签是否已存在于 tagsInfo 中
+            // Check if the new tag already exists in tagsInfo
             if (!participant.participantInfo.tagsInfo.includes(newTagName)) {
 
                 updateIds.push(participant.participantInfo._id);
 
-                // 如果不存在，则更新 tagsInfo 和 tag
+                // If not present, update tagsInfo and tag
                 const updatedParticipant = {
                     ...participant,
                     participantInfo: {
@@ -331,21 +300,22 @@ export default function StudyParticipantProvider({children}) {
         setLoading(false);
     };
 
+    // Remove a specific tag from selected participants
     async function handleRemoveTagFromSelectedRows(tagNameToRemove) {
 
         setLoading(true);
         const removeTagId = tags.find(tag => tag.tagName === tagNameToRemove)?._id || null;
         const deleteIds = [];
         const updatedParticipants = [];
-        // 遍历所有选中的参与者
+        // Iterate through all selected participants
         studyParticipants.filter(participant => selectedRows.includes(participant._id))
         .forEach(participant => {
-            // 检查要删除的标签是否存在于 tagsInfo 中
+            // Check if the tag to be deleted exists in tagsInfo
             if (participant.participantInfo.tagsInfo.includes(tagNameToRemove)) {
 
                 deleteIds.push(participant.participantInfo._id);
 
-                // 如果存在，则从 tagsInfo 和 tag 中移除
+                // If present, remove from tagsInfo and tag
                 const updatedTagsInfo = participant.participantInfo.tagsInfo.filter(tagName => tagName !== tagNameToRemove);
                 const updatedTag = participant.participantInfo.tag.filter(tagId => tagId !== removeTagId);
                 
@@ -388,8 +358,6 @@ export default function StudyParticipantProvider({children}) {
         setLoading(false);
     }
         
-
-    
     const context = {
         studyParticipants,
         tags,

@@ -1,5 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
-import { useParams } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -10,21 +9,27 @@ import {Button} from "@mui/material";
 import Paper from "@mui/material/Paper";
 import {StyledDataGrid} from "../../styles/StyledDataGrid";
 import {CustomNoRowsOverlaySession} from "../../styles/CustomNoRowsOverlay";
+import { CustomNoRowsOverlay } from '../../styles/CustomNoRowsOverlay';
 import {GridToolbar} from "@mui/x-data-grid";
-
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
+import { combineCodeSerialNum } from '../../utils/combineCodeSerialNum';
 
 
 export default function StudyDetail({data, isClosed}){
 
 
+    // Seed data in studyData
     const [studyData, setStudyData] = useState(data);
 
 
+    // CloseStudy button
     const handleCloseStudy = async () => {
         try {
             await request.put(`/study/${studyData.studyId}`, {isClosed: true});
             alert("Study closed successfully");
 
+            // Update data in page
             setStudyData((prevData) => ({
                 ...prevData,
                 isClosed: true,
@@ -38,28 +43,40 @@ export default function StudyDetail({data, isClosed}){
 
     };
 
+    // Clear participants information button
+    // clear participants info function
     const handleAnonymousParticipants = async () => {
         try {
             const response= await request.delete(`/participant/anonymize-participants/${studyData.studyId}`);
             if(response.status === 200){
-                alert("Study anonymous successfully");
+                alert(`Study participants clear successfully! Also removed ${response.data.updatedCount} participants who are neither currently in other studies nor willing to be contacted in the future`);
+
+                await request.put(`/study/${studyData.studyId}`, {isCleared: true});
+
+                // Update data in page
+                setStudyData((prevData) => ({
+                    ...prevData,
+                    isCleared: true,
+                }));
+
             }else if(response.status === 204){
-                alert("No Participants need to be anonymous, as they are currently in other studies or willing to be contacted in the future");
+                alert("Study participants clear successfully!");
             }
             else{
-                alert("Study anonymous failed");
+                alert("Study participants clear failed");
             }
 
         } catch (error) {
-            alert(error || "Error anonymous study");
+            alert(error || "Error clear study participants");
         }
     }
 
 
-
+    // Session List state
     const [sessionList, setSessionList] = React.useState(null);
 
 
+    // Fetch session data
     useEffect(() => {
 
         const fetchData = async () => {
@@ -77,6 +94,7 @@ export default function StudyDetail({data, isClosed}){
         fetchData();
     }, [studyData]);
 
+    // Set data in session data grid
     const sessionRows = (sessionList || []).map((sessionInfo, index) => ({
         id: index + 1,
         sessionId: sessionInfo._id,
@@ -98,10 +116,10 @@ export default function StudyDetail({data, isClosed}){
     ]
 
 
-    // Participants
+    // Set Participants Grid
     const [studyParticipants, setStudyParticipants] = useState([]);
 
-
+    // Fetch paticipants information
     useEffect(() => {
         const fetchData = async () => {
             await fetchStudyParticipants();
@@ -109,7 +127,7 @@ export default function StudyDetail({data, isClosed}){
 
         fetchData();
 
-    }, [studyData, handleAnonymousParticipants]);
+    }, [studyData]);
 
 
 
@@ -122,7 +140,7 @@ export default function StudyDetail({data, isClosed}){
     const participantsRows = (studyParticipants || []).map((participantInfo, index) => ({
         id: index + 1,
         participantId: participantInfo._id,
-        serialNo: participantInfo.serialNum,
+        serialNo: combineCodeSerialNum(studyData.studyCode, participantInfo.serialNum),
         email: participantInfo.participantInfo.email,
         tag: participantInfo.participantInfo.tagsInfo.join('; '),
         winGift: participantInfo.isGift ? 'Yes' : 'No',
@@ -138,6 +156,7 @@ export default function StudyDetail({data, isClosed}){
     ];
 
 
+    // ExportData to json
     const exportData = () => {
 
         const studyInfo = {
@@ -151,7 +170,9 @@ export default function StudyDetail({data, isClosed}){
             experimentType: studyData.studyType,
             date: parseData(studyData.createdAt),
             location: studyData.location.join('; '),
-            isAnonvmous: studyData.isAnonvmous,
+            driveLink: studyData.driveLink,
+            surveyLink: studyData.surveyLink,
+            isAnonymous: studyData.isAnonymous,
             anonymousParticipantNum: studyData.anonymousParticipantNum
         }
 
@@ -191,7 +212,15 @@ export default function StudyDetail({data, isClosed}){
     };
 
 
+    const formatLink = (link) => {
+        if (!link) return "";
 
+        if (!link.startsWith("http://") && !link.startsWith("https://")) {
+          return "http://" + link;  // default add http://，can be changed as https://
+        }
+
+        return link;
+      };
 
 
     return (
@@ -210,14 +239,16 @@ export default function StudyDetail({data, isClosed}){
                             onClick={handleCloseStudy}
                             popupText={'Are you sure you want to close this study?'}
                         />
-                    ) :
-                        <OptionPopup
-                            buttonText={"Clear Participants Info"}
-                            onClick={handleAnonymousParticipants}
-                            popupText={'Are you sure you want to clear participants private info in this study?'}
-                        />
+                    ) : (
+                        !studyData.isCleared ? (
+                            <OptionPopup
+                                buttonText={"Clear Participants Info"}
+                                onClick={handleAnonymousParticipants}
+                                popupText={'Are you sure you want to clear all participants info in this study?'}
+                            />
+                        ) : null
+                    )}
 
-                    }
 
                     <div style={{ margin: '0 30px' }}></div>
 
@@ -242,19 +273,33 @@ export default function StudyDetail({data, isClosed}){
 
             <Grid item xs={12} align="left">
                 <Typography variant="h5">
-                    &nbsp;&nbsp; &nbsp;
-                    {studyData.researcherList.map((researcher, index) => (
-                        <span key={index} style={{ display: 'inline-block', textDecoration: 'underline'}}>
-                                    {researcher.firstName + ' ' + researcher.lastName}
-                            {index < studyData.researcherList.length - 1 && '；'}
-                                </span>
+                    <Stack direction="row" spacing={1}>
+                    {studyData.researcherList.map(researcher => (
+                    <Chip
+                        label={researcher.firstName + ` ` + researcher.lastName}
+                        variant="outlined"
+                        color="primary"
+                        style={{
+                            fontSize: '22px' }}
+                        />
                     ))}
+                    </Stack>
+
+{/* {studyData.researcherList.map((researcher, index) => (
+                        <span key={index} style={{ display: 'inline-block', 
+                        // textDecoration: 'underline'
+                        }}>
+                                    {researcher.firstName + ' ' + researcher.lastName}
+                            {index < studyData.researcherList.length - 1 && ';'}
+                                </span>
+                    ))} */}
                 </Typography>
             </Grid>
 
             <Grid item xs={12} align="left">
                 <Typography variant="h5" style={{ fontWeight: 'bold', color: '#19467B' }}>Description:</Typography>
-                <Box sx={{ padding: '10px', borderRadius: '4px' }}>
+                <Box sx={{ padding: '10px', borderRadius: '4px', whiteSpace: "pre-wrap"}}
+                >
                     <Typography variant="h6">{studyData.description}</Typography>
                 </Box>
             </Grid>
@@ -265,8 +310,8 @@ export default function StudyDetail({data, isClosed}){
                                 <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Experiment Type:</span>
                                 &nbsp; &nbsp; &nbsp;
 
-                                <span style={{ textDecoration: 'underline' }}>
-                                  {studyData.studyType}
+                                <span>
+                                    {studyData.studyType}
                                 </span>
                             </span>
                 </Typography>
@@ -279,8 +324,8 @@ export default function StudyDetail({data, isClosed}){
                                 <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Anonymous:</span>
                                 &nbsp; &nbsp; &nbsp;
 
-                                <span style={{ textDecoration: 'underline' }}>
-                                  {studyData.isAnonymous ? 'Yes' : 'No'}
+                                <span>
+                                    {studyData.isAnonymous ? 'Yes' : 'No'}
                                 </span>
                             </span>
                 </Typography>
@@ -292,8 +337,8 @@ export default function StudyDetail({data, isClosed}){
                                 <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Project Start Date:</span>
                                 &nbsp; &nbsp; &nbsp;
 
-                                <span style={{ textDecoration: 'underline' }}>
-                                  {parseData(studyData.recruitmentStartDate)}
+                                <span>
+                                    {parseData(studyData.recruitmentStartDate)}
                                 </span>
 
                             </span>
@@ -305,8 +350,8 @@ export default function StudyDetail({data, isClosed}){
                             <span>
                                 <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Project Close Date:</span>
                                 &nbsp; &nbsp; &nbsp;
-                                <span style={{ textDecoration: 'underline' }}>
-                                  {parseData(studyData.recruitmentCloseDate)}
+                                <span>
+                                    {parseData(studyData.recruitmentCloseDate)}
                                 </span>
 
                             </span>
@@ -314,40 +359,65 @@ export default function StudyDetail({data, isClosed}){
             </Grid>
 
             <Grid item xs={12} align="h5">
-                <Typography variant="h5" style={{ marginBottom: '10px' }}>
+                <Typography variant="h5"
+                // style={{ marginBottom: '10px' }}
+                >
                     <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Location:</span>
                 </Typography>
             </Grid>
 
+            {studyData.location && studyData.location.length > 0 ? (
             <Grid item xs={12} align="h5">
                 <Typography variant="h5" style={{ marginBottom: '10px' }}>
-                    &nbsp; &nbsp; &nbsp;
-                    <span style={{ textDecoration: 'underline' }}>
-                              {studyData.location.join("; \u00A0")}
-                            </span>
+
+                    <Stack direction="row" spacing={1}>
+                    {studyData.location.map(eachLocation => (
+                    <Chip
+                        label={eachLocation}
+                        variant="outlined"
+                        style={{
+                            fontSize: '18px' }}
+                        />
+                    ))}
+                    </Stack>
 
                 </Typography>
-            </Grid>
+            </Grid> ) : null}
 
 
             <Grid item xs={12} align="left">
                 <Typography variant="h5" style={{ marginBottom: '10px' }}>
                     <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Survey Link:</span>
-                    &nbsp; &nbsp; &nbsp;
 
-                    <span style={{ textDecoration: 'underline', color: '#4299C3' }}>
-                                  {studyData.surveyLink}
-                                </span>
+                    <br></br>
+
+                    <a href={formatLink(studyData.surveyLink)} target="_blank" rel="noopener noreferrer"
+                        style={{
+                            fontSize: '20px', // Set font size
+                            textDecoration: 'none', // Remove underline
+                            color: '#4299C3', // Link text color
+                            padding: '8px', // Add padding
+                            display: 'inline-block' }}>
+                        {studyData.surveyLink}
+                    </a>
                 </Typography>
             </Grid>
 
             <Grid item xs={12} align="left">
                 <Typography variant="h5" style={{ marginBottom: '10px' }}>
                     <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Drive Link:</span>
-                    &nbsp; &nbsp; &nbsp;
-                    <span style={{ textDecoration: 'underline', color: '#4299C3' }}>
-                                  {studyData.driveLink}
-                                </span>
+                    <br></br>
+                    <a href={formatLink(studyData.driveLink)} target="_blank" rel="noopener noreferrer"
+                        style={{
+                        fontSize: '20px', // Set font size
+                        textDecoration: 'none', // Remove underline
+                        color: '#4299C3', // Link text color
+                        padding: '8px', // Add padding
+                        borderRadius: '4px', // Rounded corners
+                        display: 'inline-block', // Make the link inline-block to apply padding properly
+                    }}>
+                        {studyData.driveLink}
+                    </a>
                 </Typography>
             </Grid>
 
@@ -359,53 +429,59 @@ export default function StudyDetail({data, isClosed}){
                     <span style={{ fontWeight: 'bold', display: 'inline-block', color: '#19467B' }}>Status:</span>
                     &nbsp; &nbsp; &nbsp;
 
-                    <span style={{ textDecoration: 'underline' }}>
+                    <span>
                                 {studyData.isClosed ? 'Close' : 'Active'}
-                                </span>
+                    </span>
                     &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+
                 </Typography>
             </Grid>
 
 
 
+            { !studyData.isCleared && !studyData.isAnonymous &&
 
-            <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '50px', width: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '50px', width: '100%' }}>
                 <Paper sx={{ flex: 1, width: '100%' }}>
-                    <Grid container alignItems="center" justifyContent="center">
-                        <Typography variant="h5" style={{ marginTop: '10px', fontWeight: 'bold', display: 'inline-block', color: '#19467B'}}>Session List</Typography>
-                    </Grid>
+                <Grid container alignItems="center" justifyContent="center">
+                <Typography variant="h5" style={{ marginTop: '10px', fontWeight: 'bold', display: 'inline-block', color: '#19467B'}}>Session List</Typography>
+                </Grid>
 
-                    <StyledDataGrid
-                        sx={{
-                            height: "65vh",
-                            maxWidth: '100vw',
-                            overflowY: 'auto',
-                            overflowX: 'hidden',
-                            marginTop: 2,
-                            '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
-                            '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
-                            '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
-                        }}
-                        rows={sessionRows}
-                        columns={sessionColumns}
-                        initialState={{
-                            pagination: {
-                                paginationModel: { page: 0, pageSize: 10 },
-                            },
-                        }}
-                        pageSizeOptions={[10, 25, 50]}
-                        slots={{
-                            noRowsOverlay: CustomNoRowsOverlaySession,
-                            toolbar: GridToolbar
-                        }}
-                        disableSelectionOnClick
-                        hideFooterSelectedRowCount
-                        checkboxSelection
-                    />
+                <StyledDataGrid
+                sx={{
+                height: "65vh",
+                maxWidth: '100vw',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                marginTop: 2,
+                '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' }
+            }}
+                rows={sessionRows}
+                columns={sessionColumns}
+                initialState={{
+                pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+            },
+            }}
+                pageSizeOptions={[10, 25, 50]}
+                slots={{
+                noRowsOverlay: CustomNoRowsOverlaySession,
+                toolbar: GridToolbar
+            }}
+                disableSelectionOnClick
+                hideFooterSelectedRowCount
+                checkboxSelection
+                />
 
                 </Paper>
-            </div>
+                </div>
 
+            }
+
+
+            {!studyData.isCleared  &&
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                 <Paper sx={{ flex: 1, width: '100%' }}>
                     <Grid container alignItems="center" justifyContent="center">
@@ -434,7 +510,7 @@ export default function StudyDetail({data, isClosed}){
                         }}
                         pageSizeOptions={[10, 25, 50]}
                         slots={{
-                            noRowsOverlay: CustomNoRowsOverlaySession,
+                            noRowsOverlay: CustomNoRowsOverlay,
                             toolbar: GridToolbar
                         }}
                         disableSelectionOnClick
@@ -443,8 +519,7 @@ export default function StudyDetail({data, isClosed}){
                     />
 
                 </Paper>
-            </div>
-
+            </div>}
 
 
 

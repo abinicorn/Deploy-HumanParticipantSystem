@@ -1,17 +1,29 @@
+/* 
+Adjusts the alignment of the footer container in DataGrid to the start of the container
+*/
 .MuiDataGrid-footerContainer {
     justify-content: flex-start !important;
 }
 
+/* 
+Ensures the pagination controls in the table don't get cut off if they overflow their container
+*/
 .MuiTablePagination-root {
     overflow: visible !important;
 }
 
+/* 
+Sets a specific height for the participant table popup on standard resolution screens
+*/
 @media (min-resolution: 1dppx) {
     .participant-Table-Pop-Up {
         height: 87vh;
     }
 }
 
+/* 
+Adjusts the height for the participant table popup on screens with a higher pixel density (like some Retina displays)
+*/
 @media (min-resolution: 1.25dppx) {
     .participant-Table-Pop-Up {
         height: 83vh;

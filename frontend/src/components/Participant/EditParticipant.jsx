@@ -11,24 +11,30 @@ import OptionPopup from '../Popup/OptionPopup';
 import { checkEmailValidation } from '../../utils/checkEmailValidation';
 import { checkPhoneNumValidation } from '../../utils/checkPhoneNumValidation'
 
+import { Autocomplete } from '@mui/material';
 
-export default function EditParticipant({participant, onSave, isAnonymous}) {
-    const [localParticipant, setLocalParticipant] = useState(participant);
-    const [editOpen, setEditOpen] = useState(false); 
-    const [emailError, setEmailError] = useState('');
-    const [phoneNumError, setPhoneNumError] = useState('');
+export default function EditParticipant({participant, onSave, isAnonymous, allTags}) {
 
+    //Define state variables
+    const [localParticipant, setLocalParticipant] = useState(participant); //Local participant data
+    const [editOpen, setEditOpen] = useState(false); //Control the opening and closing of the edit dialog box
+    const [emailError, setEmailError] = useState(''); // Email format error message
+    const [phoneNumError, setPhoneNumError] = useState(''); // Phone number format error message
+
+    //Reset local participant data when the edit dialog is opened or participant data changes
     useEffect(() => {
         if (editOpen) {
             setLocalParticipant(participant);  // Reset localParticipant when the dialog opens
         }
     }, [editOpen, participant]);
 
+    //Reset data function
     const resetData = () => {
         setEmailError('');
         setPhoneNumError('');
     }
 
+    //Add tag function
     const handleAddTag = (tag) => {
         if (!localParticipant.participantInfo.tagsInfo.includes(tag)) {
             setLocalParticipant(prev => ({ 
@@ -41,6 +47,7 @@ export default function EditParticipant({participant, onSave, isAnonymous}) {
         }
     };
 
+    //delete tag function
     const handleDeleteTag = (tagToDelete) => {
         setLocalParticipant(prev => ({
             ...prev,
@@ -51,6 +58,7 @@ export default function EditParticipant({participant, onSave, isAnonymous}) {
         }));
     };
 
+    // save the edition
     const handleSave = async () => {
         if (!checkEmailValidation(localParticipant.participantInfo.email)) {
             setEmailError('Invalid email format');
@@ -72,8 +80,7 @@ export default function EditParticipant({participant, onSave, isAnonymous}) {
 
     return (
         <div>
-            {/* This button will trigger the edit dialog */}
-            <IconButton onClick={() => setEditOpen(true)}>
+            <IconButton onClick={() => setEditOpen(true)} data-testid="EditIconBtn">
                 <EditIcon color="primary"/>
             </IconButton>
 
@@ -191,27 +198,54 @@ export default function EditParticipant({participant, onSave, isAnonymous}) {
                         label="This participant is willing to receive the report."
                     />
                     <Typography variant="h6" style={{ marginTop: '20px', marginBottom: '20px' }}>Tags:</Typography>
-                    <Grid container spacing={2}>
-                        {localParticipant.participantInfo.tagsInfo.map((tag, index) => (
-                            <Grid item key={index}>
-                                <Chip 
-                                    label={tag}
-                                    onDelete={() => handleDeleteTag(tag)}
+                        <Grid container spacing={2}>
+                            {localParticipant.participantInfo.tagsInfo.map((tag, index) => (
+                                <Grid item key={index}>
+                                    <Chip 
+                                        label={tag}
+                                        onDelete={() => handleDeleteTag(tag)}
+                                    />
+                                </Grid>
+                            ))}
+                        </Grid>
+                        <Grid container spacing={2} alignItems="center">
+                            <Grid item xs={5}>
+                                <Autocomplete
+                                    multiple
+                                    id="tags-standard"
+                                    options={allTags.map(tagObj => tagObj.tagName)}
+                                    value={[]}
+                                    onChange={(event, newValue) => {
+                                        const newTag = newValue[newValue.length - 1];
+                                        if (newTag && !localParticipant.participantInfo.tagsInfo.includes(newTag)) {
+                                            handleAddTag(newTag);
+                                        }
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField 
+                                            {...params}
+                                            variant="standard"
+                                            label="Current Tags"
+                                            placeholder="Select or type"
+                                            style={{ width: '250px' }}
+                                        />
+                                    )}
                                 />
                             </Grid>
-                        ))}
-                        <Grid item>
-                            <Input 
-                                placeholder="Add Tag"
-                                onKeyPress={(event) => {
-                                    if (event.key === 'Enter') {
-                                        handleAddTag(event.target.value);
-                                        event.target.value = '';  // Clear the input after adding the tag
-                                    }
-                                }}
-                            />
+                            <Grid item xs={6}>
+                                <Input 
+                                    placeholder="Add a New Tag"
+                                    style={{ marginTop: '15px' }}
+                                    onKeyPress={(event) => {
+                                        if (event.key === 'Enter') {
+                                            handleAddTag(event.target.value);
+                                            event.target.value = '';  // Clear the input after adding the tag
+                                        }
+                                    }}
+                                />
+                            </Grid>
                         </Grid>
-                    </Grid>
+                    
                     <Typography variant="h6" style={{ marginTop: '20px' }}>
                         Status:
                     </Typography>

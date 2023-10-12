@@ -9,12 +9,10 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import EditIcon from '@mui/icons-material/Edit';
 import PeopleIcon from '@mui/icons-material/People';
-// import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DescriptionIcon from '@mui/icons-material/Description';
 import TopicIcon from '@mui/icons-material/Topic';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-// import ResearcherManagePopup from '../components/Researcher/ResearcherManagePopup'; 
 import SessionManagePage from './SessionManagePage';
 import EditStudyPage from './EditStudyPage';
 import ParticipantManagePage from './ParticipantManagePage';
@@ -25,7 +23,6 @@ import { authService } from "../services/authService";
 import StudyDetail from "../components/Study/StudyDetail";
 import { DataGridProvider } from '../providers/DataGridProvider';
 import {useEffect} from "react";
-import { useCurrentUser } from '../hooks/useCurrentUser';
 
 const drawerWidth = 240;
 
@@ -166,15 +163,6 @@ export default function SingleStudyPage() {
       handleCloseUserMenu();
     };
 
-    // const handleOpenResearcher = () => {
-    //   setComponent('general')
-    //   setOpenResearcher(true);
-    // };
-
-    // const handleCloseResearcher = () => {
-    //   setOpenResearcher(false);
-    //   // navigate(`/studyInfo/${studyId}`);
-    // }
 
   // Function to get the current component state from local storage
     const getCurrentComponentFromLocalStorage = () => {
@@ -286,15 +274,6 @@ export default function SingleStudyPage() {
               </ListItem>
               ) : null}
 
-              {/* {!isClosed && studyInfo.creator === user.userId ? (
-              <ListItem key={2} disablePadding sx={{ display: 'block' }} onClick={handleOpenResearcher}>
-                <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
-                  <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center'}}>{actionList[2].icon}</ListItemIcon>
-                  <ListItemText sx={{ opacity: open ? 1 : 0 }}>{actionList[2].title}</ListItemText>
-                </ListItemButton>
-              </ListItem>
-              ) : null} */}
-
               {!isClosed ? (
               <ListItem key={2} disablePadding sx={{ display: 'block', ...(component === 'participant' && {backgroundColor: '#e0e0e0'}) }} onClick={() => setComponent('participant')}>
                 <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5,}}>
@@ -344,9 +323,7 @@ export default function SingleStudyPage() {
                 }
               </div>
               }
-              {/* {openResearcher && 
-                <ResearcherManagePopup open={() => handleOpenResearcher()} onClose={() => {handleCloseResearcher()}}/>
-              } */}
+
         </Box>
       </Box>
     )

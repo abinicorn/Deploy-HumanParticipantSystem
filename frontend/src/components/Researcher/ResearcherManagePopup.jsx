@@ -3,7 +3,6 @@ import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Avatar from '@mui/material/Avatar';
@@ -13,15 +12,12 @@ import {
     Typography,
     TextField,
     Button,
-    Stack,
-    Alert
+    Stack
 } from '@mui/material';
 import "../../styles/App.css";
 import { StudyResearcherContext } from '../../providers/StudyResearcherContextProvider';
 import { request } from '../../utils/request';
-import OptionPopup from '../Popup/OptionPopup';
 import MsgPopup from '../Popup/MsgPopup';
-import DeletePopupButton from '../Button/DeletePopupButton';
 import Autocomplete from '@mui/material/Autocomplete';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
@@ -50,9 +46,7 @@ export default function ResearcherManagePopup() {
         studyInfo,
         allResearchers,
         removeResearcher,
-        fetchResearcherbyEmail,
         refreshResearcherContext,
-        refreshStudyDetailContext
     } = React.useContext(StudyResearcherContext);
 
 
@@ -94,7 +88,6 @@ export default function ResearcherManagePopup() {
             console.log(researcherId);
             const data = await request.put(`/study/associateResearcher/${studyInfo._id}/${researcherId}`);
             if (data.status === 200) {
-                console.log("success");
                 refreshResearcherContext();
             }
         } catch (error) {
@@ -110,11 +103,14 @@ export default function ResearcherManagePopup() {
                 {researcher.username}
             </Typography>
 
-            {researcher._id !== studyInfo.creator && <DeletePopupButton
+            {researcher._id !== studyInfo.creator && 
+            <CloseCircleButton
                 popupText={"Do you want to remove this researcher from the study?"}
                 onClick={() =>{handleDeleteResearcher(researcher._id)}}
                 size={'10px'}
             />}
+
+
         </Stack>
     ) : null;
 
@@ -133,6 +129,7 @@ export default function ResearcherManagePopup() {
                 </DialogTitle>
                 <IconButton
                     aria-label="close"
+                    data-testid="close-button"
                     onClick={handleClose}
                     sx={{
                         position: 'absolute',
@@ -155,23 +152,6 @@ export default function ResearcherManagePopup() {
 
                     </Typography>
 
-
-{/* Change this input into other */}
-                        {/* <Paper
-                            component="form"
-                            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 500 }}
-                        >
-                            <InputBase
-                                sx={{ ml: 1, flex: 1 }}
-                                placeholder="Search existing researchers by email address"
-                                inputProps={{ 'aria-label': 'search by Email Address' }}
-                                onChange={(e) => {
-                                    setEmail(e.target.value);
-                                }}
-                            />
-
-
-                        </Paper> */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Autocomplete
                         id="Existing Researcher Email Address"
@@ -205,13 +185,8 @@ export default function ResearcherManagePopup() {
 
                     <Typography gutterBottom>
                         <h3>Add New Researcher to the System</h3>
-
                     </Typography>
-                    {/* <div
-                    // className='align-right'
-                    > */}
-                            <AddRsearcherPopup />
-                    {/* </div> */}
+                    <AddRsearcherPopup />
 
 
 
@@ -219,18 +194,7 @@ export default function ResearcherManagePopup() {
                         handleAddRsearcher(researcherId);
                     }} />
 
-
-
-
-
-
-
                 </DialogContent>
-                {/* <DialogActions>
-                    <Button autoFocus variant="contained" onClick={handleClose}>
-                        Save changes
-                    </Button>
-                </DialogActions> */}
             </BootstrapDialog>
         </>
     );

@@ -4,24 +4,24 @@ import {CssBaseline, Grid} from "@mui/material";
 import { Chip, Button} from '@mui/material';
 import {useEffect, useState} from "react";
 import '../styles/App.css';
-import StudyDetailPopup from "../components/Study/StudyDetailPopup"
 import {useCurrentUser} from "../hooks/useCurrentUser";
 import { useNavigate } from 'react-router-dom';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/Common/Navbar';
 import {request} from "../utils/request";
-import { Link } from 'react-router-dom';
 import {CustomNoRowsOverlayDashboard} from "../styles/CustomNoRowsOverlay";
 import {StyledDataGrid} from "../styles/StyledDataGrid";
-import OptionPopup from "../components/Popup/OptionPopup";
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import { PotentialParticipantProvider } from '../providers/PotentialParticipantProvider';
+import PotentialParticipantPopUp from '../components/Participant/PotentialParticipantPopUp';
 
 
 
 export default function ResearcherDashboardPage() {
 
+    // Get user_id from current user,
     const {user} = useCurrentUser();
     const navigate= useNavigate();
     const [loading, setLoading] = React.useState(false)
@@ -29,7 +29,7 @@ export default function ResearcherDashboardPage() {
     useEffect(() => {
 
 
-
+        // Get StudyList under current user
         const fetchData = async () => {
 
                     try {
@@ -42,6 +42,7 @@ export default function ResearcherDashboardPage() {
 
                         const currentTime = new Date().getTime();
 
+                        // Display expired and active study to remind user
                         const expiredProjects = studyInfoList.data.filter(study => {
                             const closeDate = new Date(study.recruitmentCloseDate).getTime();
                             return closeDate < currentTime && !study.status;
@@ -68,12 +69,12 @@ export default function ResearcherDashboardPage() {
 
     const [allStudyList, setAllStudyList] = useState(null);
 
-
+    // CurrentRows dispalys allStudyList or expiredStudyList
     const [currentRows, setCurrentRows] = useState([]);
     const [isAlternateRows, setIsAlternateRows] = useState(false);
 
 
-
+    // Switch rows
     const toggleRows = () => {
         if (isAlternateRows) {
             setCurrentRows(allStudyList);
@@ -86,6 +87,8 @@ export default function ResearcherDashboardPage() {
 
 
 
+
+
     function getStudyList  (data) {
 
         const parseData = (data || []).map((studyInfo, index) => ({
@@ -93,19 +96,10 @@ export default function ResearcherDashboardPage() {
             studyId: studyInfo.studyId,
             studyCode: studyInfo.studyCode,
             name: studyInfo.studyName,
-            participantProgress: { value: studyInfo.participantCurrentNum, maxValue: studyInfo.participantNum},
+            participantProgress:  { value: studyInfo.participantCurrentNum, maxValue: studyInfo.participantNum},
             status: !studyInfo.status,
-            // description: studyInfo.description,
-            // creator: studyInfo.creator.firstName + ' ' + studyInfo.creator.lastName,
-            // researcherList: studyInfo.researcherList,
-            // studyType: studyInfo.studyType,
-            // recruitmentStartDate: studyInfo.recruitmentStartDate,
             recruitmentCloseDate: studyInfo.recruitmentCloseDate,
-            // location: studyInfo.location,
-            // driveLink: studyInfo.driveLink,
-            // createdAt: studyInfo.createdAt,
-            // updatedAt: studyInfo.updatedAt,
-            // surveyLink: studyInfo.surveyLink
+            isCleared: studyInfo.isCleared
         }))
 
         return parseData;
@@ -113,14 +107,7 @@ export default function ResearcherDashboardPage() {
 
 
 
-    const [selectedStudy, setSelectedStudy] = useState(null);
 
-    const [isStudyDetailPopupOpen, setIsStudyDetailPopupOpen] = useState(false);
-
-    const handleStudyDetailClosePopup = () => {
-        setSelectedStudy(null);
-        setIsStudyDetailPopupOpen(false);
-    };
 
 
     function LinearProgressWithLabel(props) {
@@ -131,7 +118,7 @@ export default function ResearcherDashboardPage() {
         );
     }
 
-
+    const [openParticipantPopUp, setOpenParticipantPopUp] = React.useState(false);
 
 
     const columns = [
@@ -161,18 +148,28 @@ export default function ResearcherDashboardPage() {
             flex: 1,
             headerClassName: 'App-Font',
             valueGetter: (params) => `${params.value.value} / ${params.value.maxValue}`,
-            renderCell: (params) => (
-                <Box sx={{ width: '100%' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <LinearProgressWithLabel value={params.row.participantProgress.value >= params.row.participantProgress.maxValue ? 100 : (params.row.participantProgress.value / params.row.participantProgress.maxValue) * 100} />
-                        <Box sx={{ minWidth: 35 }}>
-                            <Typography variant="body2" color="text.secondary">
-                                {params.value}
-                            </Typography>
+            renderCell: (params) => {
+                if (params.row.isCleared) {
+                    return (
+                        <Typography variant="body2" color="text.secondary">
+                            Participants information has been cleared.
+                        </Typography>
+                    );
+                } else {
+                    return (
+                        <Box sx={{ width: '100%' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <LinearProgressWithLabel value={params.row.participantProgress.value >= params.row.participantProgress.maxValue ? 100 : (params.row.participantProgress.value / params.row.participantProgress.maxValue) * 100} />
+                                <Box sx={{ minWidth: 35 }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {params.value}
+                                    </Typography>
+                                </Box>
+                            </Box>
                         </Box>
-                    </Box>
-                </Box>
-            ),
+                    );
+                }
+            },
             width: 250,
         },
         {
@@ -193,7 +190,7 @@ export default function ResearcherDashboardPage() {
         }
     ];
 
-
+    // Create study button
     const handleCreateStudy = () =>{
         
         navigate('/studyDetail/create');
@@ -203,6 +200,7 @@ export default function ResearcherDashboardPage() {
 
 
     const buttonText = isAlternateRows ? 'All Study' : 'Expired Study';
+
 
     return (
 
@@ -232,6 +230,17 @@ export default function ResearcherDashboardPage() {
                                 lineHeight: 'normal',
                             }} onClick={toggleRows}>{buttonText}</Button> }
 
+                        <div style={{ margin: '0 30px' }}></div>
+
+                        <Button variant="contained" sx={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            padding: '10px',
+                            lineHeight: 'normal',
+                        }} onClick={() => {setOpenParticipantPopUp(true)}}>Potential Participants</Button>
+                        <PotentialParticipantProvider>
+                            <PotentialParticipantPopUp open={openParticipantPopUp} onClose={() => setOpenParticipantPopUp(false)}/>
+                        </PotentialParticipantProvider>
 
                         <div style={{ margin: '0 30px' }}></div>
 
@@ -276,9 +285,7 @@ export default function ResearcherDashboardPage() {
 
 
 
-            {isStudyDetailPopupOpen && (
-                <StudyDetailPopup study={selectedStudy} onClose={handleStudyDetailClosePopup} open={isStudyDetailPopupOpen}/>
-            )}
+
 
 
 

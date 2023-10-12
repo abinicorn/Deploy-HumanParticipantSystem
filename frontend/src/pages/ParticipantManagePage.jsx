@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Button, Box, Typography, Grid } from '@mui/material';
+import React, { useEffect, useContext } from 'react';
+import {Box} from '@mui/material';
 import AddParticipant from '../components/Participant/AddParticipant';
 import StudyParticipantActionBtn from '../components/Button/StudyParticipantActionBtn';
 import ParticipantsTable from '../components/Participant/StudyParticipantTable';

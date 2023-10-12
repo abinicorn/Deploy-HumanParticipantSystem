@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, Typography, Button, Box, DialogActions } from '@mui/material';
+import React, { useContext, useEffect, useCallback } from 'react';
+import { Dialog, DialogContent, Button, Box, DialogActions } from '@mui/material';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import ParticipantsTable from './StudyParticipantTable'
 import EmailInputComponent from '../DataGrid/EmailInputComponent';
@@ -12,38 +12,42 @@ export default function StudyParticipantTable({open, onClose}) {
     const {inputEmails, setInputEmails} = useContext(DataGridContext);
     const {studyParticipants, setSelectedRows} = useContext(StudyParticipantContext);
 
-
+    // Function to exit the full screen mode
     function closeFullscreen() {
         if (document.exitFullscreen) {
-            document.exitFullscreen();
+          document.exitFullscreen();
         } else if (document.webkitExitFullscreen) { /* Safari */
-            document.webkitExitFullscreen();
+          document.webkitExitFullscreen();
         } else if (document.msExitFullscreen) { /* IE11 */
-            document.msExitFullscreen();
+          document.msExitFullscreen();
         }
     }
 
-    const handleFullscreenChange = () => {
+    // Handler to manage behavior when the fullscreen state changes
+    const handleFullscreenChange = useCallback(() => {
         if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
-            // not in fullscreen status
+            // If not in fullscreen status, close the dialog
             onClose();
         }
-    };
+    }, [onClose]);
 
+    // Add and remove event listeners for fullscreen changes when the component mounts and unmounts
     useEffect(() => {
         document.addEventListener("fullscreenchange", handleFullscreenChange);
         document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
         document.addEventListener("mozfullscreenchange", handleFullscreenChange);
         document.addEventListener("MSFullscreenChange", handleFullscreenChange);
-
+    
         return () => {
-            // clear event listeners
+            // clear event listeners upon component unmount
             document.removeEventListener("fullscreenchange", handleFullscreenChange);
             document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
             document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
             document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
         };
-    }, []);
+    }, [handleFullscreenChange]);
+    
+    
 
     return (
         <div >

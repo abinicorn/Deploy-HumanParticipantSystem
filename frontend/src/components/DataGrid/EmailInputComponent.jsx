@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import getEmailIds from '../../utils/getEmailIds'; 
 import { DataGridContext } from '../../providers/DataGridProvider';
@@ -6,14 +6,15 @@ import { DataGridContext } from '../../providers/DataGridProvider';
 function EmailInputComponent({rows, setSelectedRows, inputEmails, setInputEmails}) {
     const {selectRowsByEmails} = useContext(DataGridContext);
 
+    // allow user to press enter or esc to submit or clear
     function handleKeyPress(event) {
         if (event.key === 'Enter') {
             handleSetSelectedRowsByEmails();
-            event.preventDefault(); // 阻止默认行为，避免页面刷新
+            event.preventDefault(); // prevent page refresh
         }
         if (event.key === 'Escape') {
             handleClearInput();
-            event.preventDefault();
+            event.preventDefault(); // prevent page refresh
         }
     }
 

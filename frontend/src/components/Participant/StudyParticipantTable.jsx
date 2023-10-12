@@ -1,12 +1,9 @@
-import React, {useState, useEffect, useContext} from 'react';
-import {Chip, Typography, Box, Button, Menu, MenuItem, TextField, LinearProgress } from '@mui/material';
-import {styled} from '@mui/material/styles'
-import { DataGrid, GridToolbar, GRID_CHECKBOX_SELECTION_COL_DEF, gridPageCountSelector,
-GridPagination, useGridApiContext, useGridSelector } from '@mui/x-data-grid';
+import React, {useState, useContext} from 'react';
+import {Chip, Typography, Box, Button} from '@mui/material';
+import {GridToolbar} from '@mui/x-data-grid';
 
 import EditParticipant from './EditParticipant';
 import CloseCircleButton from '../Button/CloseCircleButton';
-import OptionPopup from '../Popup/OptionPopup';
 import OptionDialog from '../Popup/OptonDialog';
 
 import { combineCodeSerialNum } from '../../utils/combineCodeSerialNum';
@@ -23,36 +20,37 @@ import '../../styles/DataGrid.css';
 
 export default function ParticipantsTable() {
 
-    const {studyParticipants, finalUpdateStudyParticipant, toggleStudyParticipantsProperty, 
+  // Get status and methods from context
+    const {studyParticipants, tags, finalUpdateStudyParticipant, toggleStudyParticipantsProperty, 
           toggleParticipantsProperty, handleAddTagToSelectedRows, handleRemoveTagFromSelectedRows,
-          isAnonymous, selectedRows, setSelectedRows, loading, setLoading, setStudyParticipantNotActive} = useContext(StudyParticipantContext);
-    
+          isAnonymous, selectedRows, setSelectedRows, loading, setLoading, setStudyParticipantNotActive
+    } = useContext(StudyParticipantContext);
     const {
       sortModel, setSortModel,
       filterModel, setFilterModel,
       pageModel, setPageModel,
       columnVisibility, setColumnVisibility
     } = useContext(DataGridContext);  
-
     const {studyInfo} = useContext(StudyResearcherContext);
 
+    //Initialize local state
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
     const [newTag, setNewTag] = useState('');
 
+    // Define the style of the grid based on the number of participants
     const gridStyle = studyParticipants.length === 0
     ? { height: '55vh',
-    // width: '99%' 
   }
     : { height: '100%',
-    // width: '99%' 
   };
 
+  // Function to update participant information
     const handleUpdateParticipant = async (updatedParticipant) => {
       const response = await finalUpdateStudyParticipant(updatedParticipant);
       return response;
     };
 
+    // Function to delete participants
     const handleDelete = async (studyParticipant) => {
         const response = await setStudyParticipantNotActive(studyParticipant)
         console.log(response);
@@ -60,6 +58,7 @@ export default function ParticipantsTable() {
     
     const [selectedProperty, setSelectedProperty] = useState("");
 
+    // store the toogle property selected by user
     const handlePropertyChange = (event) => {
       setSelectedProperty(event.target.value);
     };
@@ -93,6 +92,7 @@ export default function ParticipantsTable() {
       updateToggleStudyParticipants(dataToSend, selectedProperty)
     };
 
+    //Function to combine data
     function assembleData(participants, property) {
       if (property  === "isWillContact") {
         const ids = participants.map(participant => participant.participantInfo._id);
@@ -135,6 +135,8 @@ export default function ParticipantsTable() {
       }
   }
 
+  // put selected rows to the top of the table
+  // Achieved by changing the weight of sorting, then resorting
   const reorderRowsBasedOnSelection = (rows, selectedRows) => {
     return [...rows].sort((a, b) => {
       const aIsSelected = selectedRows.includes(a._id);
@@ -148,6 +150,7 @@ export default function ParticipantsTable() {
   };
   
 
+  // Define the basic structure of the column
     let baseColumns = [
       { 
         field: 'serialNum', 
@@ -165,6 +168,7 @@ export default function ParticipantsTable() {
       }
     ];
 
+    //Add or delete some columns based on whether they are anonymous or not
     if (!isAnonymous) {
       baseColumns = [
           ...baseColumns,
@@ -184,6 +188,7 @@ export default function ParticipantsTable() {
       ];
     };
 
+    // Define the basic structure of the column
     baseColumns = [
       ...baseColumns,
       { 
@@ -209,6 +214,7 @@ export default function ParticipantsTable() {
       }
     ];
 
+    //Add or delete some columns based on whether they are anonymous or not
     if (!isAnonymous) {
       baseColumns = [
           ...baseColumns,
@@ -223,6 +229,7 @@ export default function ParticipantsTable() {
       ];
     };
     
+    // Define the whole structure of the column
     const columns = [
         ...baseColumns,
         { 
@@ -286,7 +293,7 @@ export default function ParticipantsTable() {
                 return sortedTags.join(', ');
             },
             renderCell: (params) => {
-              // 从value中分割tags
+              // Split tags from value
               const tags = params.value ? params.value.split(', ').filter(tag => tag) : [];
               return (
                   <div style={{
@@ -322,6 +329,7 @@ export default function ParticipantsTable() {
                     participant={params.row} 
                     onSave={handleUpdateParticipant}
                     isAnonymous={isAnonymous}
+                    allTags={tags}
                 />
             )
         },
@@ -354,25 +362,51 @@ export default function ParticipantsTable() {
                     <option value="isWIllReceiveReport">Report Requested</option>
                     <option value="isWillContact">Future Contact</option>
                   </select>
-                  <button onClick={handleToggleSelectedRows}>Toggle Selected Rows</button>
+                    <Button style={{ 
+                        maxHeight: '20px',
+                        minWidth: '30px',
+                        fontSize: '10px',
+                        }} 
+                        variant="outlined" 
+                        onClick={handleToggleSelectedRows}
+                      >Toggle Selected Rows</Button>
+
+
                 </div>
                 <div style={{display: 'flex', alignItems: 'flex-end'}}>
-                <input 
-                  type="text" 
-                  value={newTag} 
-                  onChange={(e) => setNewTag(e.target.value)}
-                  placeholder="New Tag" 
-                />
-                <button 
+                  <input 
+                    type="text" 
+                    value={newTag} 
+                    onChange={(e) => setNewTag(e.target.value)}
+                    placeholder="New Tag"
+                    list="tags-datalist"
+                  />
+                  <datalist id="tags-datalist">
+                    {tags.map((tag, index) => (
+                      <option key={index} value={tag.tagName} />
+                    ))}
+                  </datalist>
+                <Button 
+                  style={{ 
+                    maxHeight: '20px',
+                    minWidth: '30px',
+                    fontSize: '10px',
+                    }} 
+                  variant="outlined"
                   onClick={() => handleAddTagToSelectedRows(newTag)}
-                >
-                  Add Tag to Selected Rows
-                </button>
-                <button
+                  >  Add Tag to Selected Rows </Button>
+
+                <Button 
+                  style={{ 
+                    maxHeight: '20px',
+                    minWidth: '30px',
+                    fontSize: '10px',
+                    }} 
+                  variant="outlined"
+                  color='error'
                   onClick={() => handleRemoveTagFromSelectedRows(newTag)}
-                >
-                  Delete Tag from Selected Rows
-                </button>
+                  >  Delete Tag from Selected Rows </Button>
+
                 </div>
                 <Button 
                   variant="outlined"
@@ -402,25 +436,31 @@ export default function ParticipantsTable() {
                     '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '8px' },
                     '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '15px' },
                 }} 
-                // autoHeight
+
                 rows={reorderRowsBasedOnSelection(studyParticipants, selectedRows)}
-                // rows={Array.isArray(studyParticipants) ? studyParticipants : []}
+
                 columns={columns}
                 loading={loading}
-                // columnVisibilityModel={{
-                //     // Hide column note at the beginning, the other columns will remain visible
-                //     hidden: ['note']
-                // }}
-                //rowHeight='40px'
+
+                // adjust row height by num of tags in each row
                 getRowHeight={(params) => {
+                  const dpr = window.devicePixelRatio || 1; // get pixel ratio of client
                   const tagsCount = params.model.participantInfo.tagsInfo.length;
                   const baseHeight = 40;
                   const extraHeightPerThreeTags = 20;
-                  if(tagsCount <= 3) return baseHeight;
-                  return baseHeight + Math.ceil(tagsCount / 3 - 1) * extraHeightPerThreeTags;
-              }}
-                //getRowHeight={() => 'auto'}
-                // getRowHeight={() => 'auto'}
+                  let ratio;
+              
+                  // set how many tags contained in base height
+                  if (dpr <= 1) { // pixel ratio below 100%
+                      ratio = 3;
+                  } else { // pixel ratio over than 100%
+                      ratio = 2;
+                  }
+
+                  if(tagsCount <= ratio) return baseHeight;
+                  return baseHeight + Math.ceil(tagsCount / ratio - 1) * extraHeightPerThreeTags;
+                }}
+            
                 getRowId={(row) => row._id}
                 paginationModel={pageModel}
                 density="compact"
@@ -447,7 +487,6 @@ export default function ParticipantsTable() {
                 slots={{
                     pagination: CustomPagination,
                     noRowsOverlay: CustomNoRowsOverlay,
-                    //loadingOverlay: LinearProgress,
                     toolbar: GridToolbar
                 }}
                 pageSizeOptions={[25, 50, 100]}
@@ -468,9 +507,9 @@ export default function ParticipantsTable() {
                 onColumnVisibilityModelChange={(newModel) => {
                     setColumnVisibility(newModel);
                 }}
-                // autoPageSize             
+            
                 disableRowSelectionOnClick
-                // hideFooterSelectedRowCount
+
             />
         </div>
 

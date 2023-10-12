@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import {useState} from 'react';
 import {
-    Container,
-    Typography,
     TextField,
     Select,
     MenuItem,
@@ -14,7 +12,6 @@ import {
     Radio,
     RadioGroup,
 } from '@mui/material';
-import Navbar from '../Navbar';
 import CreateIcon from '@mui/icons-material/Create';
 import GroupIcon from '@mui/icons-material/Group';
 import ScienceIcon from '@mui/icons-material/Science';
@@ -38,6 +35,7 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
         });
     };
 
+    //handle adding multiple location details to the study 
     const addLocation = () => {
         if (locationInput.trim() !== '') {
             setStudyData({
@@ -48,6 +46,7 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
         }
     };
 
+    //handle removing location details from the study
     const removeLocation = (index) => {
         const newLocations = studyData.location.filter((_, i) => i !== index);
         setStudyData({ ...studyData, location: newLocations });
@@ -72,26 +71,23 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
 
     return (
         <div>
-            <div 
-            // style={{ paddingTop: '64px' }}
-            >
-                {/* <Container> */}
-                    {/* maxWidth="sm" */}
+            <div>
+
                     <form onSubmit={handleSubmit}>
-                    {/* <Typography variant="h4" component="h1" color="grey" gutterBottom>
-                    Study Details
-                </Typography> */}
+
                         <Grid container spacing={2}>
 
                         <Grid item xs={12}>
                                 <FormLabel>What's the title of the study?</FormLabel>
                                 <TextField
                                     fullWidth
+                                    label="Study Name"
                                     name="studyName"
                                     value={studyData.studyName}
                                     onChange={handleInputChange}
                                     required
                                     margin="dense"
+                                    inputProps={{ "data-testid": "studyNameInput" }}
                                 />
                             </Grid>
 
@@ -99,6 +95,7 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                 <FormLabel>Specify a code for your study</FormLabel>
                                 <TextField
                                     fullWidth
+                                    label="Study Code"
                                     name="studyCode"
                                     value={studyData.studyCode}
                                     onChange={handleInputChange}
@@ -117,12 +114,13 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                     value={studyData.studyType}
                                     onChange={handleInputChange}
                                     required
+                                    data-testid={"studyTypeInput"}
                                 >
-                                    <MenuItem value="interview"> <CreateIcon style={{ minWidth: '40px' }} />  Interview</MenuItem>
-                                    <MenuItem value="focus-group"> <GroupIcon style={{ minWidth: '40px' }} /> Focus Group</MenuItem>
-                                    <MenuItem value="experiment"> <ScienceIcon style={{ minWidth: '40px' }} /> Experiment</MenuItem>
-                                    <MenuItem value="online-survey"> <AssignmentIcon style={{ minWidth: '40px' }} /> Online Survey</MenuItem>
-                                    <MenuItem value="questionnaire"> <ContactPageIcon style={{ minWidth: '40px' }} /> Questionnaire</MenuItem>
+                                    <MenuItem value="Interview"> <CreateIcon style={{ minWidth: '40px' }} />  Interview</MenuItem>
+                                    <MenuItem value="Focus Group"> <GroupIcon style={{ minWidth: '40px' }} /> Focus Group</MenuItem>
+                                    <MenuItem value="Experiment"> <ScienceIcon style={{ minWidth: '40px' }} /> Experiment</MenuItem>
+                                    <MenuItem value="Online Survey"> <AssignmentIcon style={{ minWidth: '40px' }} /> Online Survey</MenuItem>
+                                    <MenuItem value="Questionnaire"> <ContactPageIcon style={{ minWidth: '40px' }} /> Questionnaire</MenuItem>
                                 </Select>
                             </Grid>
 
@@ -146,6 +144,8 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                 <FormLabel>Number of anonymous participants you currently have:</FormLabel>
                                 <TextField
                                     fullWidth
+
+                                    data-testid={"AnonymousParticipantInput"}
                                     name="anonymousParticipantNum"
                                     value={studyData.anonymousParticipantNum}
                                     onChange={handleInputChange}
@@ -206,22 +206,24 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                                             color="primary"
                                             variant="outlined"
                                             style={{ margin: '4px' }}
+                                            data-testid={`location-chip-${index}`}
                                         />
                                     ))
                                     }
                                 </Stack>
                                 <TextField
-                                    // fullWidth
+                                    
                                     label="Add your location here"
                                     name="location"
                                     value={locationInput}
                                     onChange={(e) => setLocationInput(e.target.value)}
                                     margin="dense"
+                                    inputProps={{ "data-testid": "location-input" }}
                                 />
 
                             </Grid>
                             <Grid item xs={12}>
-                                <Button variant="outlined" onClick={addLocation}>Add new location</Button>
+                                <Button variant="outlined" onClick={addLocation} data-testid="add-location-button">Add new location</Button>
                             </Grid>
                             <Grid item xs={6}>
                                 <FormLabel>Expected Number of Participants</FormLabel>
@@ -277,7 +279,6 @@ export default function EditStudyTemplate({ isEditMode, studyData, setStudyData,
                             </Grid>
                         </Grid>
                     </form>
-                {/* </Container> */}
             </div>
         </div>
     );

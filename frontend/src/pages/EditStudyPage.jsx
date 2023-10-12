@@ -11,7 +11,7 @@ import { StudyResearcherContext } from '../providers/StudyResearcherContextProvi
 
 export default function EditStudyPage() {
     const { studyId } = useParams();
-    // const researcherId = '64fe98fdae1ff28bdcd455a7';
+    
     const navigate = useNavigate("/");
 
     const {user}= useCurrentUser();
@@ -45,7 +45,7 @@ export default function EditStudyPage() {
             researcherList: data.researcherList,
             studyType: data.studyType ?? "",
             isAnonymous: data.isAnonymous ?? "",
-            anonymousParticipantNum: data.anonymousParticipantNum ?? "",
+            anonymousParticipantNum: (data.isAnonymous && data.anonymousParticipantNum) ?? "",
             participantNum: data.participantNum ?? "",
             recruitmentStartDate: data.recruitmentStartDate?.split("T")[0] ?? "",
             recruitmentCloseDate: data.recruitmentCloseDate?.split("T")[0] ?? "",
@@ -63,7 +63,6 @@ export default function EditStudyPage() {
                 alert("Successfully edited study");
                 refreshStudyDetailContext();
                 refresh();
-                // navigate(`/studyInfo/${studyId}`);
 
             })
         
@@ -102,15 +101,6 @@ export default function EditStudyPage() {
                 />
             </Container>
         </>
-            // <>
-
-            // <EditStudyTemplate
-            //     isEditMode={true}
-            //     studyData={studyData}
-            //     setStudyData={setStudyData}
-            //     handleSubmit={handleSubmit}
-            // />
-            // </>
     );
 
 
